@@ -1,4 +1,4 @@
-# DaZe: Sports Analytics DSL (Lenguaje de Dominio Específico)
+# DaZe: DSL para analisis deportivo
 
 Este repositorio contiene la implementación de **DaZe** (`.dz`), un lenguaje de dominio específico diseñado para modelar flujos reproducibles de análisis de datos deportivos, preparación de plantillas de jugadores y generación de pizarras de rendimiento.
 
