@@ -5,7 +5,7 @@ from antlr4 import ParserRuleContext
 
 from src.generated.DaZeParser import DaZeParser
 from src.generated.DaZeParserVisitor import DaZeParserVisitor
-from src.core.tabla import Tabla, GrupoTabla
+from src.core.racoons import Tabla, GrupoTabla
 from src.semantic.tabla_simbolos import TablaSimbolos, Simbolo
 from src.errors import SemanticError, DiagnosticError
 

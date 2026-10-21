@@ -5,7 +5,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.semantic.tabla_simbolos import TablaSimbolos, Simbolo
-from src.core.tabla import Tabla
+from src.core.racoons import Tabla
 from src.semantic.visitor import ejecutar_codigo
 
 

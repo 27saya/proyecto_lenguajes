@@ -6,7 +6,7 @@ import tempfile
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.semantic.visitor import ejecutar_codigo, ejecutar_archivo
-from src.core.tabla import Tabla
+from src.core.racoons import Tabla
 
 
 class TestInterpreter(unittest.TestCase):

@@ -325,3 +325,7 @@ class Tabla:
 
     def __repr__(self) -> str:
         return f"<Tabla {len(self.columnas)} cols, {len(self.filas)} filas>"
+
+
+# Alias para permitir usar racoons como nombre de la libreria/clase
+racoons = Tabla

@@ -5,7 +5,7 @@ import tempfile
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.core.tabla import Tabla
+from src.core.racoons import Tabla, racoons
 
 
 class TestCoreTabla(unittest.TestCase):
@@ -96,6 +96,13 @@ class TestCoreTabla(unittest.TestCase):
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
+
+    def test_alias_racoons_como_libreria(self):
+        from src import racoons as rc
+        self.assertIs(rc, Tabla)
+        instancia = rc(["col1"], [{"col1": 100}])
+        self.assertEqual(len(instancia), 1)
+        self.assertEqual(instancia.filas[0]["col1"], 100)
 
 
 if __name__ == "__main__":

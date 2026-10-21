@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional, List
-from src.core.tabla import Tabla
+from src.core.racoons import Tabla
 
 
 class Simbolo:
