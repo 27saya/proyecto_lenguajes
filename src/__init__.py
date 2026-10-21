@@ -4,6 +4,7 @@ from .generated.DaZeParser import DaZeParser
 from .errors import DaZeErrorListener, DiagnosticError, SemanticError
 from .tree_viewer import format_parse_tree, print_parse_tree
 from .core import Tabla, GrupoTabla, suma, media, mediana, minimo, maximo, desviar, contar
+from .core import tabla as racoons
 from .semantic import TablaSimbolos, Simbolo, DaZeSemanticVisitor, ejecutar_codigo, ejecutar_archivo
 from typing import Tuple, List
 
