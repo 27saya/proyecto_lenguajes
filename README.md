@@ -128,7 +128,7 @@ pizarra barras(resumenposiciones) {
 ## Guía de ejecución (Linux)
 
 ### 1. Requisitos previos
-Tener instalados Python 3.11 o superior, `python3-venv` y Java (JRE 11+ únicamente en caso de querer recompilar las gramáticas `.g4` de ANTLR):
+Tener instalados Python 3.11 o superior, `python3-venv` y Java (JRE 11+ únicamente en caso de querer recompilar las gramáticas `.g4` de ANTLR): (usar apt solo si la distro lo permite, usa el package manager de la distro que tengas xd)
 
 ```bash
 sudo apt update
