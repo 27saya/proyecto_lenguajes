@@ -1,0 +1,6 @@
+# Error semantico: Intento de convocar una columna no existente en la plantilla
+jugadores = fichar("datos/plantilla_temporada.csv");
+
+# 'salario' no existe en la plantilla temporada (solo dorsal, nombre, club, posicion, minutos, goles, asistencias)
+plantilla = jugadores
+    |> convocar(dorsal, nombre, salario);

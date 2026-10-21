@@ -7,13 +7,13 @@ programa            ::= { sentencia } EOF ;
 
 sentencia           ::= asignacion
                       | pipeline_stmt
-                      | llamada_stmt
                       | graficar_stmt
                       | guardar_stmt
                       | mostrar_stmt
                       | si_stmt
                       | funcion_stmt
-                      | retornar_stmt ;
+                      | retornar_stmt
+                      | llamada_stmt ;
 
 asignacion          ::= identificador '=' expr [ ';' ] ;
 
@@ -61,8 +61,8 @@ op_rebautizar       ::= 'rebautizar' '(' lista_asignaciones ')' ;
 op_clasificar       ::= 'clasificar' '(' argumentos_ordenar ')' ;
 op_alinear          ::= 'alinear' '(' argumentos_agrupar ')' | 'alinear' 'por' [ '[' ] lista_columnas [ ']' ] ;
 op_balance          ::= 'balance' '(' lista_resumen ')' ;
-op_reemplazar_bajas ::= 'reemplazar_bajas' '(' argumentos_con_nombre ')' ;
-op_depurar_plantilla ::= 'depurar_plantilla' '(' [ argumentos_con_nombre | lista_columnas ] ')' ;
+op_reemplazar_bajas ::= ( 'sanear' | 'recuperar' | 'reemplazar_bajas' ) '(' argumentos_con_nombre ')' ;
+op_depurar_plantilla ::= ( 'depurar' | 'limpiar' | 'depurar_plantilla' ) '(' [ argumentos_con_nombre | lista_columnas ] ')' ;
 op_top              ::= 'top' '(' ENTERO ')' ;
 op_personalizada    ::= identificador '(' [ lista_argumentos ] ')' ;
 
@@ -80,7 +80,7 @@ lista_resumen       ::= resumen_par { ',' resumen_par } ;
 resumen_par         ::= identificador '=' ( funcion_agregacion | expr ) ;
 
 funcion_agregacion  ::= ( 'contar' | 'conteo' ) '(' ')'
-                      | ( 'suma' | 'media' | 'promedio' | 'mediana' | 'minimo' | 'min' | 'maximo' | 'max' | 'desv_std' | 'desviacion' ) '(' ( identificador | CADENA ) ')' ;
+                      | ( 'suma' | 'media' | 'promedio' | 'mediana' | 'minimo' | 'min' | 'maximo' | 'max' | 'desviar' | 'desviacion' | 'desv_std' ) '(' ( identificador | CADENA ) ')' ;
 
 argumentos_con_nombre ::= argumento_con_nombre { ',' argumento_con_nombre } ;
 argumento_con_nombre  ::= identificador '=' expr ;

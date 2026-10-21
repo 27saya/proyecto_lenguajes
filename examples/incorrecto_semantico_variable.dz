@@ -1,0 +1,6 @@
+# Intento de uso de una variable no declarada en el flujo deportivo
+jugadores = fichar("datos/plantilla_temporada.csv");
+
+# 'factorinexistente' no fue definido en la tabla de simbolos
+resultado = jugadores
+    |> contratar(puntos = goles * factorinexistente);

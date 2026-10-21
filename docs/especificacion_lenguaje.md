@@ -56,4 +56,35 @@ DaZe es un lenguaje de dominio especifico (DSL) disenado para modelar flujos de 
 ### 4.1. Carga y Guardado de Datos
 - **`fichar(ruta, ...)`**: Carga una plantilla desde disco. Permite configurar argumentos con nombre como `separador=","` y `encabezado=verdadero`.
   ```daze
-  datos = fichar("datos/plantilla_temporada.csv", separador=",", encabezado=verdadero)
+  datos = fichar("datos/plantilla_temporada.csv", separador=",", encabezado=verdadero);
+  ```
+- **`archivar(tabla, en=ruta, ...)`**: Exporta la tabla de datos a un archivo CSV en disco.
+  ```daze
+  archivar(resumenposiciones, en="salidas/resumenposiciones.csv", separador=",");
+  ```
+- **`proyectar(expr)`**: Imprime una expresion, texto o el contenido tabular formateado en la consola.
+  ```daze
+  proyectar("Resumen calculado:");
+  proyectar(resumenposiciones);
+  ```
+
+### 4.2. Operaciones de Pipeline (`|>`)
+Las operaciones sobre tablas deportivas se encadenan mediante el operador tubería (`|>`):
+- **`convocar(...)`**: Selecciona y proyecta un subconjunto de columnas.
+- **`descartar(...)`**: Filtra filas mediante expresiones lógicas evaluadas sobre cada registro.
+- **`contratar(...)`**: Agrega o actualiza columnas calculadas a partir de expresiones aritméticas.
+- **`rebautizar(...)`**: Renombra columnas existentes en la plantilla.
+- **`clasificar(...)`**: Ordena los registros según una o varias columnas (con `descendente=verdadero` o `ascendente=verdadero`).
+- **`alinear(...)`**: Agrupa registros por una o varias columnas clave.
+- **`balance(...)`**: Aplica funciones de agregación (`suma`, `media`, `mediana`, `minimo`, `maximo`, `desviar`, `contar`) por grupo o sobre la tabla entera.
+- **`sanear(...)`** (o `recuperar`): Imputa valores nulos o faltantes en columnas específicas.
+- **`depurar(...)`** (o `limpiar`): Elimina registros duplicados en la plantilla.
+- **`top(n)`**: Limita la salida a los primeros `n` registros de la tabla.
+
+### 4.3. Control de Flujo y Funciones (Tácticas)
+- **`tactica nombre(params) { ... }`**: Define una función reutilizable de análisis deportivo con ámbito local.
+- **`resultado expr;`**: Retorna el valor evaluado de la táctica.
+- **`si (condicion) { ... } sino { ... }`**: Bifurcación condicional.
+
+### 4.4. Declaración de Pizarras Visuales
+- **`pizarra tipo(tabla) { config }`**: Especifica declaraciones de representaciones gráficas (`barras`, `lineas`, `histograma`, `dispersion`, `caja`), validando semánticamente que la tabla y las columnas indicadas pertenezcan al contexto deportivo.

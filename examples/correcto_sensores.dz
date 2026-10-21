@@ -4,28 +4,38 @@
 telemetria = fichar("datos/gps_rendimiento.csv", separador=";");
 
 # 2. Definicion de tactica (funcion) para evaluacion de sobreesfuerzo
-tactica alerta_sobrecarga(frecuencia_cardiaca, distancia_km) {
-    si (frecuencia_cardiaca > 185) {
+tactica alertasobrecarga(frecuenciacardiaca, distanciakm) {
+    si (frecuenciacardiaca > 185) {
         proyectar("Alerta: Sobrecarga cardiovascular detectada");
     } sino {
         proyectar("Rango aerobico optimo");
     }
-    resultado frecuencia_cardiaca * 1.05;
+    resultado frecuenciacardiaca * 1.05;
 }
 
+# Ejecucion de prueba de la tactica
+ajuste = alertasobrecarga(188, 10.5);
+
 # 3. Limpieza de mediciones y deteccion de desgaste
-gps_filtrado = telemetria
+gpsfiltrado = telemetria
     |> descartar(ritmo_cardiaco > 40 y velocidad_max <= 38.5)
     |> contratar(
-        gasto_calorico = minutos_jugados * 11.4,
-        indice_desgaste = sprint_count * 2.5
+        gastocalorico = minutos_jugados * 11.4,
+        indicedesgaste = sprint_count * 2.5
     )
     |> top(100);
 
-# 4. Pizarra de dispersion para correlacion fisica
-pizarra dispersion(gps_filtrado) {
+# 4. Exportar los datos limpios a CSV
+archivar(gpsfiltrado, en="salidas/telemetrialimpia.csv", separador=";");
+
+# 5. Proyectar resumen en consola
+proyectar("Telemetria de sensores procesada correctamente:");
+proyectar(gpsfiltrado);
+
+# 6. Pizarra de dispersion para correlacion fisica
+pizarra dispersion(gpsfiltrado) {
     eje_x = ritmo_cardiaco;
-    eje_y = indice_desgaste;
+    eje_y = indicedesgaste;
     titulo = "Correlacion Ritmo Cardiaco vs Desgaste";
-    guardar = "salidas/monitoreo_gps.png";
+    guardar = "salidas/monitoreogps.png";
 }

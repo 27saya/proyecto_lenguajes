@@ -4,41 +4,48 @@
 jugadores = fichar("datos/plantilla_temporada.csv", separador=",", encabezado=verdadero);
 
 # 2. Pipeline de preparacion y calculo de variables
-jugadores_aptos = jugadores
+jugadoresaptos = jugadores
     |> convocar(dorsal, club, posicion, minutos, goles, asistencias)
     |> descartar(minutos > 0 y goles >= 0)
     |> contratar(
         contribucion = goles + asistencias,
-        promedio_gol = (goles * 90) / minutos,
-        rendimiento_total = (contribucion * 1.5) + (minutos / 100),
-        indice_impacto = rendimiento_total * 0.19
+        promediogol = (goles * 90) / minutos,
+        rendimientototal = (contribucion * 1.5) + (minutos / 100),
+        indiceimpacto = rendimientototal * 0.19
     )
-    |> clasificar(por=[rendimiento_total], descendente=verdadero);
+    |> clasificar(por=[rendimientototal], descendente=verdadero);
 
 # 3. Agrupacion y calculo de metricas descriptivas
-resumen_posiciones = jugadores_aptos
+resumenposiciones = jugadoresaptos
     |> alinear(por=[posicion])
     |> balance(
-        goles_totales = suma(goles),
-        media_asistencias = media(asistencias),
-        mediana_minutos = mediana(minutos),
-        desv_rendimiento = desv_std(rendimiento_total),
-        total_convocados = contar()
+        golestotales = suma(goles),
+        mediaasistencias = media(asistencias),
+        medianaminutos = mediana(minutos),
+        desviarendimiento = desviar(rendimientototal),
+        totalconvocados = contar()
     );
 
-# 4. Declaracion de visualizaciones graficas
-pizarra barras(resumen_posiciones) {
+# 4. Exportar la tabla resumen obtenida
+archivar(resumenposiciones, en="salidas/resumenposiciones.csv", separador=",");
+
+# 5. Proyeccion del resultado en consola
+proyectar("Resumen por posicion generado correctamente:");
+proyectar(resumenposiciones);
+
+# 6. Declaracion de visualizaciones en pizarra
+pizarra barras(resumenposiciones) {
     eje_x = posicion;
-    eje_y = goles_totales;
+    eje_y = golestotales;
     titulo = "Goles Totales por Posicion";
     color = "azul";
-    guardar = "salidas/goles_por_posicion.png";
+    guardar = "salidas/golesporposicion.png";
 }
 
-pizarra dispersion(jugadores_aptos) {
+pizarra dispersion(jugadoresaptos) {
     eje_x = minutos;
-    eje_y = rendimiento_total;
+    eje_y = rendimientototal;
     titulo = "Rendimiento vs Minutos Disputados";
     color = "rojo";
-    guardar = "salidas/dispersion_rendimiento.png";
+    guardar = "salidas/dispersionrendimiento.png";
 }

@@ -1,0 +1,6 @@
+# Error semantico: Operacion con tipos incompatibles
+jugadores = fichar("datos/plantilla_temporada.csv");
+
+# Intento de restar un texto ("lesionado") de un numero (goles)
+resultado = jugadores
+    |> contratar(invalido = goles - "lesionado");
