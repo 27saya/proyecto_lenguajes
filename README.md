@@ -10,9 +10,9 @@ El proyecto utiliza **ANTLR4** para el front-end (análisis léxico y sintáctic
 
 ## Nuestras librerías propias (`src/core/`)
 
-En lugar de usar librerías de terceros como pandas o numpy, construimos nuestras propias soluciones en Python dentro del módulo `src/core/`. Esto nos permitió entender de raíz cómo se representan y manipulan las estructuras de datos tabulares en memoria y cómo se aplican las operaciones sobre los datos.
+En lugar de usar librerías de terceros como pandas o numpy, construimos nuestras propias soluciones en Python dentro de `src/core/`. Esto nos permitió entender de raíz cómo se representan y manipulan las estructuras de datos tabulares en memoria y cómo se aplican las operaciones sobre los datos.
 
-### 1. `Tabla` (`src/core/tabla.py`)
+### 1. `racoons (Tabla)` (`src/core/racoons.py`)
 Es nuestra clase principal para manejar conjuntos de datos bidimensionales (filas y columnas):
 - **`csvread(ruta, separador=',', encabezado=verdadero)`**: Lee archivos delimitados utilizando el módulo nativo de CSV de Python, infiriendo automáticamente tipos de datos (enteros, decimales, booleanos `verdadero`/`falso` y valores `nulo`).
 - **`csvsave(ruta, separador=',')`**: Escribe la tabla en disco y crea automáticamente las carpetas de salida si no existen.
@@ -39,7 +39,7 @@ Módulo numérico puro que implementa cálculos descriptivos sin dependencias ex
 
 ---
 
-## Tabla de Símbolos y Ámbitos (`src/semantic/tabla_simbolos.py`)
+## Tabla de símbolos y ambitos (`src/semantic/tabla_simbolos.py`)
 
 Para que el intérprete sepa en todo momento qué variables, tablas y funciones existen, implementamos una `TablaSimbolos` jerárquica con soporte de ámbitos:
 - **Ámbito global**: Almacena las tablas cargadas con `fichar`, los resultados de pipelines y las variables generales.
@@ -48,7 +48,7 @@ Para que el intérprete sepa en todo momento qué variables, tablas y funciones 
 
 ---
 
-## Intérprete semántico con patrón Visitor (`src/semantic/visitor.py`)
+## Intérprete semántico con patrón visitor (`src/semantic/visitor.py`)
 
 Heredando de `DaZeParserVisitor` (generado por ANTLR), `DaZeSemanticVisitor` recorre el árbol sintáctico y se encarga de:
 1. **Evaluar expresiones**: Aritmética (`+`, `-`, `*`, `/`, `%`, `^`), comparaciones (`==`, `!=`, `<`, `>`, `<=`, `>=`) y lógica (`y`, `o`, `no`).
