@@ -18,6 +18,36 @@ class DiagnosticError:
         return f"[{self.error_type}] Linea {self.line}:{self.column}{symbol_info} -> {self.message}"
 
 
+class SemanticError(Exception):
+    """Excepcion personalizada para diagnosticos semanticos."""
+
+    def __init__(
+        self,
+        message: str,
+        line: int = 0,
+        column: int = 0,
+        offending_symbol: Optional[str] = None,
+    ):
+        super().__init__(message)
+        self.message = message
+        self.line = line
+        self.column = column
+        self.offending_symbol = offending_symbol
+        self.error_type = "Semantico"
+
+    def to_diagnostic(self) -> DiagnosticError:
+        return DiagnosticError(
+            line=self.line,
+            column=self.column,
+            message=self.message,
+            offending_symbol=self.offending_symbol,
+            error_type=self.error_type,
+        )
+
+    def __str__(self) -> str:
+        return str(self.to_diagnostic())
+
+
 class DaZeErrorListener(ErrorListener):
     def __init__(self, error_type: str = "Sintactico"):
         super().__init__()

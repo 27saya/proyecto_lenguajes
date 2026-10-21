@@ -10,8 +10,8 @@ REBAUTIZAR: 'rebautizar';
 CLASIFICAR: 'clasificar';
 ALINEAR: 'alinear';
 BALANCE: 'balance';
-REEMPLAZAR_BAJAS: 'reemplazar_bajas';
-DEPURAR_PLANTILLA: 'depurar_plantilla';
+REEMPLAZAR_BAJAS: 'sanear' | 'recuperar' | 'reemplazar_bajas';
+DEPURAR_PLANTILLA: 'depurar' | 'limpiar' | 'depurar_plantilla';
 TOP: 'top';
 PIZARRA: 'pizarra';
 PROYECTAR: 'proyectar';
@@ -35,7 +35,7 @@ MEDIA: 'media' | 'promedio';
 MEDIANA: 'mediana';
 MINIMO: 'minimo' | 'min';
 MAXIMO: 'maximo' | 'max';
-DESV_STD: 'desv_std' | 'desviacion';
+DESV_STD: 'desviar' | 'desviacion' | 'desv_std';
 
 // Tipos de graficos
 BARRAS: 'barras';

@@ -1,4 +1,4 @@
-# Generated from DaZeParser.g4 by ANTLR 4.13.2
+# Generated from /home/shibakude-_-/Downloads/Proyecto_lenguajes/grammar/DaZeParser.g4 by ANTLR 4.13.2
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -69,8 +69,8 @@ def serializedATN():
         1,0,0,0,80,488,1,0,0,0,82,516,1,0,0,0,84,524,1,0,0,0,86,88,3,2,1,
         0,87,86,1,0,0,0,88,91,1,0,0,0,89,87,1,0,0,0,89,90,1,0,0,0,90,92,
         1,0,0,0,91,89,1,0,0,0,92,93,5,0,0,1,93,1,1,0,0,0,94,104,3,4,2,0,
-        95,104,3,6,3,0,96,104,3,8,4,0,97,104,3,10,5,0,98,104,3,16,8,0,99,
-        104,3,18,9,0,100,104,3,20,10,0,101,104,3,22,11,0,102,104,3,24,12,
+        95,104,3,6,3,0,96,104,3,10,5,0,97,104,3,16,8,0,98,104,3,18,9,0,99,
+        104,3,20,10,0,100,104,3,22,11,0,101,104,3,24,12,0,102,104,3,8,4,
         0,103,94,1,0,0,0,103,95,1,0,0,0,103,96,1,0,0,0,103,97,1,0,0,0,103,
         98,1,0,0,0,103,99,1,0,0,0,103,100,1,0,0,0,103,101,1,0,0,0,103,102,
         1,0,0,0,104,3,1,0,0,0,105,106,3,84,42,0,106,107,5,44,0,0,107,109,
@@ -219,7 +219,7 @@ class DaZeParser ( Parser ):
 
     literalNames = [ "<INVALID>", "'fichar'", "'archivar'", "'convocar'", 
                      "'descartar'", "'contratar'", "'rebautizar'", "'clasificar'", 
-                     "'alinear'", "'balance'", "'reemplazar_bajas'", "'depurar_plantilla'", 
+                     "'alinear'", "'balance'", "<INVALID>", "<INVALID>", 
                      "'top'", "'pizarra'", "'proyectar'", "'resultado'", 
                      "'tactica'", "'si'", "'sino'", "'en'", "'por'", "'donde'", 
                      "'como'", "'ascendente'", "'descendente'", "<INVALID>", 
@@ -468,10 +468,6 @@ class DaZeParser ( Parser ):
             return self.getTypedRuleContext(DaZeParser.Pipeline_stmtContext,0)
 
 
-        def llamada_stmt(self):
-            return self.getTypedRuleContext(DaZeParser.Llamada_stmtContext,0)
-
-
         def graficar_stmt(self):
             return self.getTypedRuleContext(DaZeParser.Graficar_stmtContext,0)
 
@@ -494,6 +490,10 @@ class DaZeParser ( Parser ):
 
         def retornar_stmt(self):
             return self.getTypedRuleContext(DaZeParser.Retornar_stmtContext,0)
+
+
+        def llamada_stmt(self):
+            return self.getTypedRuleContext(DaZeParser.Llamada_stmtContext,0)
 
 
         def getRuleIndex(self):
@@ -539,43 +539,43 @@ class DaZeParser ( Parser ):
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 96
-                self.llamada_stmt()
+                self.graficar_stmt()
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 97
-                self.graficar_stmt()
+                self.guardar_stmt()
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
                 self.state = 98
-                self.guardar_stmt()
+                self.mostrar_stmt()
                 pass
 
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
                 self.state = 99
-                self.mostrar_stmt()
+                self.si_stmt()
                 pass
 
             elif la_ == 7:
                 self.enterOuterAlt(localctx, 7)
                 self.state = 100
-                self.si_stmt()
+                self.funcion_stmt()
                 pass
 
             elif la_ == 8:
                 self.enterOuterAlt(localctx, 8)
                 self.state = 101
-                self.funcion_stmt()
+                self.retornar_stmt()
                 pass
 
             elif la_ == 9:
                 self.enterOuterAlt(localctx, 9)
                 self.state = 102
-                self.retornar_stmt()
+                self.llamada_stmt()
                 pass
 
 

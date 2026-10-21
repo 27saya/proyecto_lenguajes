@@ -9,13 +9,13 @@ programa
 sentencia
     : asignacion
     | pipeline_stmt
-    | llamada_stmt
     | graficar_stmt
     | guardar_stmt
     | mostrar_stmt
     | si_stmt
     | funcion_stmt
     | retornar_stmt
+    | llamada_stmt
     ;
 
 asignacion
