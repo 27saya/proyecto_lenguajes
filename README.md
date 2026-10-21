@@ -1,6 +1,6 @@
 # DaZe: Sports Analytics DSL (Lenguaje de Dominio Específico)
 
-¡Hola! Este repositorio contiene la implementación de **DaZe** (`.dz`), un lenguaje de dominio específico diseñado para modelar flujos reproducibles de análisis de datos deportivos, preparación de plantillas de jugadores y generación de pizarras de rendimiento.
+Este repositorio contiene la implementación de **DaZe** (`.dz`), un lenguaje de dominio específico diseñado para modelar flujos reproducibles de análisis de datos deportivos, preparación de plantillas de jugadores y generación de pizarras de rendimiento.
 
 El objetivo de DaZe es que cualquier persona interesada en analítica deportiva (como analistas de rendimiento, directores técnicos o cuerpos técnicos) pueda transformar datos de manera sencilla y declarativa mediante pipelines secuenciales (`|>`), utilizando palabras clave del mundo deportivo y sin tener que enredarse con código complejo de propósito general.
 
@@ -8,11 +8,9 @@ El proyecto utiliza **ANTLR4** para el front-end (análisis léxico y sintáctic
 
 ---
 
-## Nuestras Librerías Propias (`src/core/`)
+## Nuestras librerías propias (`src/core/`)
 
-En lugar de usar librerías de terceros como pandas o numpy, construimos nuestras propias soluciones en Python puro dentro del módulo `src/core/`. Esto nos permitió entender de raíz cómo se representan y manipulan las estructuras de datos tabulares en memoria y cómo se aplican las operaciones sobre los datos.
-
-Para que programar y probar en DaZe fuera cómodo y fluido, diseñamos los métodos de las librerías y las palabras clave del lenguaje **sin guiones bajos (`_`)**, usando nombres directos y fáciles de escribir:
+En lugar de usar librerías de terceros como pandas o numpy, construimos nuestras propias soluciones en Python dentro del módulo `src/core/`. Esto nos permitió entender de raíz cómo se representan y manipulan las estructuras de datos tabulares en memoria y cómo se aplican las operaciones sobre los datos.
 
 ### 1. `Tabla` (`src/core/tabla.py`)
 Es nuestra clase principal para manejar conjuntos de datos bidimensionales (filas y columnas):
@@ -50,7 +48,7 @@ Para que el intérprete sepa en todo momento qué variables, tablas y funciones 
 
 ---
 
-## Intérprete Semántico con Patrón Visitor (`src/semantic/visitor.py`)
+## Intérprete semántico con patrón Visitor (`src/semantic/visitor.py`)
 
 Heredando de `DaZeParserVisitor` (generado por ANTLR), `DaZeSemanticVisitor` recorre el árbol sintáctico y se encarga de:
 1. **Evaluar expresiones**: Aritmética (`+`, `-`, `*`, `/`, `%`, `^`), comparaciones (`==`, `!=`, `<`, `>`, `<=`, `>=`) y lógica (`y`, `o`, `no`).
@@ -62,15 +60,15 @@ Heredando de `DaZeParserVisitor` (generado por ANTLR), `DaZeSemanticVisitor` rec
 
 ---
 
-## Características y Sintaxis del Lenguaje
+## Características y sintaxis del lenguaje
 
-### 1. Carga y Guardado de Datos
+### 1. Carga y guardado de datos
 ```daze
 jugadores = fichar("datos/plantilla_temporada.csv", separador=",", encabezado=verdadero);
 archivar(resumenposiciones, en="salidas/resumenposiciones.csv", separador=",");
 ```
 
-### 2. Pipelines de Transformación (`|>`)
+### 2. Pipelines de transformación (`|>`)
 Las operaciones se encadenan de forma limpia y legible:
 ```daze
 jugadoresaptos = jugadores
@@ -94,13 +92,13 @@ resumenposiciones = jugadoresaptos
     );
 ```
 
-### 3. Proyecciones en Consola
+### 3. Proyecciones en consola
 ```daze
 proyectar("Resumen calculado exitosamente:");
 proyectar(resumenposiciones);
 ```
 
-### 4. Tácticas (Funciones) y Condicionales
+### 4. Tácticas (funciones) y condicionales
 ```daze
 tactica alertasobrecarga(frecuenciacardiaca, distanciakm) {
     si (frecuenciacardiaca > 185) {
@@ -114,7 +112,7 @@ tactica alertasobrecarga(frecuenciacardiaca, distanciakm) {
 ajuste = alertasobrecarga(188, 10.5);
 ```
 
-### 5. Pizarras Visuales
+### 5. Pizarras visuales
 ```daze
 pizarra barras(resumenposiciones) {
     eje_x = posicion;
@@ -127,11 +125,9 @@ pizarra barras(resumenposiciones) {
 
 ---
 
-## Guía de Ejecución en Linux
+## Guía de ejecución (Linux)
 
-A continuación se detallan los pasos para clonar, configurar y ejecutar el proyecto en distribuciones Linux (Ubuntu, Debian, Fedora, Arch, etc.):
-
-### 1. Requisitos Previos
+### 1. Requisitos previos
 Tener instalados Python 3.11 o superior, `python3-venv` y Java (JRE 11+ únicamente en caso de querer recompilar las gramáticas `.g4` de ANTLR):
 
 ```bash
@@ -139,8 +135,8 @@ sudo apt update
 sudo apt install python3 python3-pip python3-venv openjdk-17-jre -y
 ```
 
-### 2. Preparar el Entorno Virtual
-Se recomienda aislar el entorno de trabajo:
+### 2. Preparar el entorno virtual
+Se recomienda aislar el entorno de trabajo para evitar conflictos con dependencias existentes:
 
 ```bash
 cd Proyecto_lenguajes
@@ -148,15 +144,14 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Instalar Dependencias
+### 3. Instalar dependencias
 Instalar el runtime de ANTLR4 (nuestro motor de datos y estadísticas no requiere paquetes externos adicionales):
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Ejecutar un Programa en DaZe
-Para procesar un script `.dz`, ejecutarlo pasando la ruta del archivo al CLI:
+### 4. Ejecutar un programa en DaZe
 
 ```bash
 python3 src/cli.py examples/correcto_ventas.dz
@@ -166,7 +161,7 @@ python3 src/cli.py examples/correcto_estudiantes.dz
 
 Al ejecutarse, el flujo procesa los datos, muestra las tablas y mensajes en consola, valida las especificaciones de las pizarras y genera los archivos CSV correspondientes dentro del directorio `salidas/`.
 
-### 5. Opciones Adicionales de la CLI
+### 5. Opciones adicionales (opcionales)
 - **Solo validar sintaxis sin ejecutar:**
   ```bash
   python3 src/cli.py --check examples/correcto_ventas.dz
@@ -186,14 +181,14 @@ Al ejecutarse, el flujo procesa los datos, muestra las tablas y mensajes en cons
   python3 src/cli.py examples/incorrecto_semantico_tipos.dz
   ```
 
-### 6. Ejecución de la Batería de Pruebas
-Para correr todas las pruebas unitarias y de integración del proyecto:
+### 6. Ejecución de pruebas
+Para correr todas las pruebas
 
 ```bash
 python3 -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-### 7. Regeneración de la Gramática (Opcional)
+### 7. Regeneración de la gramática (opcional)
 Los archivos de ANTLR ya se encuentran generados en `src/generated/`. Sin embargo, si se modifican `grammar/DaZeLexer.g4` o `grammar/DaZeParser.g4`, se pueden recompilar con:
 
 ```bash
