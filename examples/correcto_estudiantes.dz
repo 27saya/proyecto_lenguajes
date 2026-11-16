@@ -26,13 +26,13 @@ balancecategorias = canteranospromesa
 archivar(balancecategorias, en="salidas/balancecantera.csv", separador=",");
 
 # 5. Proyectar en consola
-proyectar("Balance de cantera juvenil generado exitosamente:");
+proyectar("Balance de cantera juvenil generado con exito:");
 proyectar(balancecategorias);
 
 # 6. Representacion en pizarra visual
 pizarra barras(balancecategorias) {
     eje_x = categoria;
     eje_y = promediogeneral;
-    titulo = "Promedio de Rendimiento por Categoria Juvenil";
+    titulo = "Promedio de rendimiento por categoria juvenil";
     guardar = "salidas/rendimientojuvenil.png";
 }

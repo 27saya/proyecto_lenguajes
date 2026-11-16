@@ -1,5 +1,5 @@
 # 1. Matematicas puras desde cero (Newton-Raphson y Series de Taylor)
-proyectar("=== 1. MOTOR MATEMATICO PURO ===");
+proyectar("1. Motor matematico puro");
 r = raiz(49);
 proyectar("Raiz cuadrada de 49 (Babilonico):");
 proyectar(r);
@@ -9,7 +9,7 @@ proyectar("Seno de 0 rad (Taylor):");
 proyectar(s);
 
 # 2. Arreglos y modificacion por corchetes []
-proyectar("=== 2. LISTAS Y ACCESO INDEXADO ===");
+proyectar("2. Listas y acceso indexado");
 tiempos = [10, 20, 30];
 proyectar("Primer tiempo antes de mutar:");
 proyectar(tiempos[0]);
@@ -19,7 +19,7 @@ proyectar("Lista tras modificar tiempos[0]:");
 proyectar(tiempos);
 
 # 3. Bucle condicional tematico (while -> enjuego / en_juego)
-proyectar("=== 3. BUCLE CONDICIONAL (ENJUEGO) ===");
+proyectar("3. Bucle condicional (enjuego)");
 contador = 1;
 enjuego (contador <= 3) {
     proyectar(contador);
@@ -27,13 +27,13 @@ enjuego (contador <= 3) {
 }
 
 # 4. Bucle iterador tematico (for -> ronda)
-proyectar("=== 4. BUCLE ITERADOR (RONDA) ===");
+proyectar("4. Bucle iterador (ronda)");
 ronda (val en tiempos) {
     proyectar(val);
 }
 
 # 5. Estructura Pila (LIFO)
-proyectar("=== 5. ESTRUCTURA PILA (LIFO) ===");
+proyectar("5. Estructura pila (lifo)");
 mi_pila = pila();
 apilar(mi_pila, "Atleta 1");
 apilar(mi_pila, "Atleta 2");
@@ -44,7 +44,7 @@ proyectar("Pila restante tras desapilar:");
 proyectar(mi_pila);
 
 # 6. Estructura Cola (FIFO)
-proyectar("=== 6. ESTRUCTURA COLA (FIFO) ===");
+proyectar("6. Estructura cola (fifo)");
 mi_cola = cola();
 encolar(mi_cola, 100);
 encolar(mi_cola, 200);

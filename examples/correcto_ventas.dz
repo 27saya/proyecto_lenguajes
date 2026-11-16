@@ -30,22 +30,22 @@ resumenposiciones = jugadoresaptos
 archivar(resumenposiciones, en="salidas/resumenposiciones.csv", separador=",");
 
 # 5. Proyeccion del resultado en consola
-proyectar("Resumen por posicion generado correctamente:");
+proyectar("Resumen por posicion generado con exito:");
 proyectar(resumenposiciones);
 
 # 6. Declaracion de visualizaciones en pizarra
 pizarra barras(resumenposiciones) {
     eje_x = posicion;
     eje_y = golestotales;
-    titulo = "Goles Totales por Posicion";
-    color = "azul";
+    titulo = "Goles totales por posicion";
+    color = "royalblue";
     guardar = "salidas/golesporposicion.png";
 }
 
 pizarra dispersion(jugadoresaptos) {
     eje_x = minutos;
     eje_y = rendimientototal;
-    titulo = "Rendimiento vs Minutos Disputados";
-    color = "rojo";
+    titulo = "Rendimiento vs minutos disputados";
+    color = "crimson";
     guardar = "salidas/dispersionrendimiento.png";
 }

@@ -84,18 +84,29 @@ class TestVisualizacionYML(unittest.TestCase):
         if os.path.exists(ruta_test_png):
             os.remove(ruta_test_png)
 
-    def test_renderizado_pizarra_nativa_barras(self):
+    def test_renderizado_pizarra_nativa_barras_con_texto(self):
         filas = [{"pos": "DEL", "goles": 10}, {"pos": "MED", "goles": 5}]
         config = {
             "eje_x": "pos",
             "eje_y": "goles",
-            "titulo": "Test Barras",
+            "titulo": "Goles por posicion",
             "guardar": "/tmp/test_barras.png",
         }
         renderizar_pizarra_nativa("barras", filas, config)
         self.assertTrue(os.path.exists("/tmp/test_barras.png"))
         if os.path.exists("/tmp/test_barras.png"):
             os.remove("/tmp/test_barras.png")
+
+    def test_canvas_png_texto_bitmap(self):
+        canvas = CanvasPNG(ancho=200, alto=100)
+        canvas.texto(10, 10, "DaZe 10", color=(10, 10, 10), escala=1)
+        canvas.texto_centrado(30, "Titulo", color=(20, 20, 20), escala=2)
+
+        # Verificar que se modificaron pixeles con el color del texto
+        pixeles_texto = sum(
+            1 for fila in canvas.pixeles for p in fila if p in ((10, 10, 10), (20, 20, 20))
+        )
+        self.assertGreater(pixeles_texto, 20)
 
     def test_matematica_pura(self):
         self.assertAlmostEqual(raiz_cuadrada(49), 7.0, places=4)

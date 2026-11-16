@@ -1,17 +1,17 @@
 proyectar("==================================================================");
-proyectar("   CASO DE ESTUDIO OFICIAL: SPORTS ANALYTICS DSL (DAZE .DZ)       ");
+proyectar("   Caso de estudio oficial: sports analytics DSL (DaZe .dz)       ");
 proyectar("==================================================================");
 
-# 1. CARGA INICIAL DE LA PLANTILLA PROFESIONAL
+# 1. Carga inicial de la plantilla profesional
 proyectar("");
-proyectar(">>> [1/5] Cargando plantilla deportiva...");
+proyectar("[1/5] Cargando plantilla deportiva...");
 plantilla = fichar("datos/rendimiento_jugadores.csv", separador=",", encabezado=verdadero);
 proyectar("Total registros cargados:");
 proyectar(longitud(plantilla));
 
-# 2. LIMPIEZA Y TRANSFORMACION MEDIANTE PIPELINE FUNCIONAL (|>)
+# 2. Limpieza y transformacion mediante pipeline funcional (|>)
 proyectar("");
-proyectar(">>> [2/5] Ejecutando transformacion y derivacion de metricas...");
+proyectar("[2/5] Ejecutando transformacion y derivacion de metricas...");
 analisis_ofensivo = plantilla
     |> convocar(dorsal, nombre, posicion, minutos, goles, asistencias, distancia_km)
     |> descartar(minutos >= 800)
@@ -26,9 +26,9 @@ top_cinco = analisis_ofensivo |> top(5);
 proyectar("Top 5 jugadores con mayor contribucion ofensiva:");
 proyectar(top_cinco);
 
-# 3. AGREGACION ESTADISTICA DESCRIPTIVA (BALANCE POR POSICION)
+# 3. Agregacion estadistica descriptiva (balance por posicion)
 proyectar("");
-proyectar(">>> [3/5] Calculando indicadores agrupados por posicion...");
+proyectar("[3/5] Calculando indicadores agrupados por posicion...");
 resumen_posiciones = analisis_ofensivo
     |> alinear(por=[posicion])
     |> balance(
@@ -42,11 +42,11 @@ resumen_posiciones = analisis_ofensivo
 proyectar(resumen_posiciones);
 archivar(resumen_posiciones, en="salidas/resumen_posiciones.csv", separador=",");
 
-# 4. MODELOS DE MACHINE LEARNING Y METODOS NUMERICOS PUROS
+# 4. Modelos de machine learning y metodos numericos puros
 proyectar("");
-proyectar(">>> [4/5] Aplicando Machine Learning sin dependencias externas...");
+proyectar("[4/5] Aplicando machine learning sin dependencias externas...");
 
-# A. Correlacion de Pearson: Minutos vs Goles
+# A. Correlacion de Pearson: minutos vs goles
 minutos_lista = [1250, 1300, 890, 1020, 900, 1180, 940, 1150, 1080, 1120, 980, 1260, 1210, 870, 1170];
 goles_lista   = [  14,   16,   2,    3,   0,   18,   4,   11,    2,   10,   1,    2,    5,   7,    0];
 
@@ -54,7 +54,7 @@ r_pearson = correlacion(minutos_lista, goles_lista);
 proyectar("Coeficiente de correlacion de Pearson (r):");
 proyectar(r_pearson);
 
-# B. Regresion Lineal Simple (MCO)
+# B. Regresion lineal simple (MCO)
 modelo_goles = regresion_lineal(minutos_lista, goles_lista);
 proyectar("Pendiente calculada (m):");
 proyectar(modelo_goles["m"]);
@@ -68,7 +68,7 @@ prediccion_1000 = predecir_regresion(modelo_goles, 1000);
 proyectar("Goles esperados para un jugador con 1000 minutos:");
 proyectar(prediccion_1000);
 
-# C. Agrupamiento K-Means de perfiles [Minutos, Contribucion]
+# C. Agrupamiento K-Means de perfiles [minutos, contribucion]
 datos_perfiles = [
     [1250, 23], [1300, 19], [1180, 22], [1150, 18], [1120, 16],
     [890, 10],  [940, 16],  [870, 11],  [1210, 11],
@@ -81,47 +81,47 @@ proyectar(clusters_plantilla["centroides"]);
 proyectar("Etiquetas asignadas por jugador:");
 proyectar(clusters_plantilla["etiquetas"]);
 
-# 5. GENERACION DE LAS 4 PIZARRAS VISUALES (EXPORTACION A PNG)
+# 5. Generacion de las 4 pizarras visuales (exportacion a PNG)
 proyectar("");
-proyectar(">>> [5/5] Renderizando y exportando pizarras visuales...");
+proyectar("[5/5] Renderizando y exportando pizarras visuales...");
 
-# Visualizacion 1: Barras
+# Visualizacion 1: barras
 pizarra barras(resumen_posiciones) {
     eje_x = "posicion";
     eje_y = "total_goles";
-    titulo = "Goles Totales por Posicion Tactica";
+    titulo = "Goles totales por posicion tactica";
     color = "royalblue";
     guardar = "salidas/1_goles_por_posicion.png";
 }
 
-# Visualizacion 2: Dispersion
+# Visualizacion 2: dispersion
 pizarra dispersion(analisis_ofensivo) {
     eje_x = "minutos";
     eje_y = "contribucion";
-    titulo = "Minutos Disputados vs Contribucion Ofensiva";
+    titulo = "Minutos disputados vs contribucion ofensiva";
     color = "crimson";
     guardar = "salidas/2_dispersion_minutos_contribucion.png";
 }
 
-# Visualizacion 3: Histograma
+# Visualizacion 3: histograma
 pizarra histograma(analisis_ofensivo) {
     eje_x = "minutos";
-    titulo = "Distribucion de Minutos en la Plantilla";
+    titulo = "Distribucion de minutos en la plantilla";
     color = "seagreen";
     guardar = "salidas/3_histograma_minutos.png";
 }
 
-# Visualizacion 4: Lineas
+# Visualizacion 4: lineas
 top_ocho = analisis_ofensivo |> top(8);
 pizarra lineas(top_ocho) {
     eje_x = "nombre";
     eje_y = "contribucion";
-    titulo = "Curva de Rendimiento Ofensivo Top 8";
+    titulo = "Curva de rendimiento ofensivo top 8";
     color = "darkorange";
     guardar = "salidas/4_lineas_top_ofensivo.png";
 }
 
 proyectar("");
 proyectar("==================================================================");
-proyectar("CASO DE ESTUDIO COMPLETADO Y ARCHIVADO EXITOSAMENTE");
+proyectar("Caso de estudio completado y archivado exitosamente.");
 proyectar("==================================================================");
