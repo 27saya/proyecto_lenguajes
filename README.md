@@ -65,7 +65,7 @@ Generador gráfico con renderizado dual:
 
 ---
 
-## Tabla de Símbolos y Ámbitos (`src/semantic/tabla_simbolos.py`)
+## Tabla de símbolos y ambitos (`src/semantic/tabla_simbolos.py`)
 
 Para que el intérprete controle las variables, tablas, estructuras y subrutinas en tiempo de ejecución:
 - **Ámbito global**: Mantiene las plantillas cargadas, resultados de pipelines y variables globales.
@@ -74,7 +74,7 @@ Para que el intérprete controle las variables, tablas, estructuras y subrutinas
 
 ---
 
-## Intérprete semántico con patrón Visitor (`src/semantic/visitor.py`)
+## Intérprete semántico con patrón visitor (`src/semantic/visitor.py`)
 
 Heredando de `DaZeParserVisitor` (generado por ANTLR), `DaZeSemanticVisitor` recorre el AST y se encarga de:
 1. **Evaluar expresiones**: Aritmética (`+`, `-`, `*`, `/`, `%`, `^`), comparaciones (`==`, `!=`, `<`, `>`, `<=`, `>=`) y lógica booleana (`y`, `o`, `no`).
@@ -138,7 +138,7 @@ proyectar(tope(p));
 desapilar(p);
 ```
 
-### 4. Modelos de Machine Learning
+### 4. Modelos de ML (machine learning)
 ```daze
 # Correlacion de Pearson
 minutos = [120, 340, 500, 750, 900, 1100, 1300];
@@ -154,7 +154,7 @@ prediccion = predecir(modelo, 1000);
 clusters = agruparkmedias([[1250, 23], [1180, 22], [890, 10], [1020, 4]], 2);
 ```
 
-### 5. Pizarras visuales (exportación física a PNG)
+### 5. Pizarras visuales (exportación a PNG)
 ```daze
 pizarra barras(resumen_posiciones) {
     eje_x = "posicion";
@@ -189,8 +189,8 @@ pip install -r requirements.txt
 chmod +x daze
 ```
 
-### 2. Consola interactiva (REPL Oficial)
-Puedes iniciar la terminal interactiva de DaZe directamente con el comando:
+### 2. Consola interactiva (REPL)
+Puedes iniciar la termminal propia de DaZe directamente con el comando:
 
 ```bash
 ./daze
@@ -198,7 +198,7 @@ Puedes iniciar la terminal interactiva de DaZe directamente con el comando:
 python3 src/cli.py
 ```
 
-Dentro del REPL dispones de comandos de utilidad:
+Dentro del REPL se dispone de comandos de utilidad:
 - `ayuda`: Muestra la guía de instrucciones disponibles.
 - `simbolos`: Imprime el estado actual de las variables y tablas cargadas en memoria.
 - `limpiar`: Limpia la pantalla de la terminal.
