@@ -36,9 +36,9 @@ def renderizar_arbol(tree, parser):
 
 BANNER = """
 ╔══════════════════════════════════════════════════════════════════════╗
-║                 DaZe: Sports Analytics DSL - v1.0.0                  ║
-║                  Consola Interactiva (REPL Oficial)                  ║
-║   Escribe código DaZe, 'ayuda' para comandos o 'salir' para terminar ║
+║                       DaZe: DSL deportivo :P                         ║
+║                         Consola Interactiva                          ║
+║   Para código en DaZe, 'ayuda' para comandos o 'salir' para terminar ║
 ╚══════════════════════════════════════════════════════════════════════╝"""
 
 
@@ -75,7 +75,7 @@ def ejecutar_bloque(codigo_fuente, visitor):
         if resultado is not None and not codigo_limpio.endswith(";"):
             print(f"=> {resultado}")
     except Exception as e:
-        print(f"[Error Semantico] {str(e)}")
+        print(f"[Error semantico] {str(e)}")
 
 
 def iniciar_repl():
@@ -92,7 +92,7 @@ def iniciar_repl():
 
             if nivel_llaves == 0:
                 if linea_limpia in ("salir", "exit", "quit"):
-                    print("Cerrando sesion de DaZe. ¡Hasta pronto!")
+                    print("Saliendo del bosque.... ta luego")
                     break
 
                 if linea_limpia in ("limpiar", "clear"):
@@ -119,7 +119,7 @@ Instrucciones admitidas:
                     continue
 
                 if linea_limpia == "simbolos":
-                    print("--- Simbolos en Memoria ---")
+                    print("Simbolos en memoria")
                     ts = getattr(visitor, "tabla_simbolos", None)
                     if ts and hasattr(ts, "simbolos"):
                         for k, v in ts.simbolos.items():
@@ -142,7 +142,7 @@ Instrucciones admitidas:
             buffer_codigo = []
             nivel_llaves = 0
         except EOFError:
-            print(chr(10) + "Cerrando sesion de DaZe.")
+            print(chr(10) + "Saliendo del bosque a la fuerza.")
             break
 
 
@@ -202,7 +202,7 @@ def main():
         sys.exit(1)
 
     if solo_check:
-        print(f"✓ El archivo '{ruta_archivo}' es sintacticamente valido.")
+        print(f"El archivo '{ruta_archivo}' es sintacticamente valido.")
         return
 
     if ver_arbol:
@@ -212,7 +212,7 @@ def main():
     base_dir = os.path.dirname(os.path.abspath(ruta_archivo))
     visitor = DaZeSemanticVisitor(base_dir=base_dir)
     visitor.visit(tree)
-    print(f"✓ Ejecucion completada con exito para '{ruta_archivo}'.")
+    print(f"Ejecucion completada con exito para '{ruta_archivo}'.")
 
 
 if __name__ == "__main__":
