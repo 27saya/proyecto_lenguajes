@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generador de la Guía de Estudio Integral para Sustentación del DSL DaZe.
+Generador de la Guía Integral de Estudio y Sustentación - FASE FINAL (3/3)
+Proyecto DSL DaZe (.dz) - Lenguaje de Dominio Específico para Analítica Deportiva
 Universidad Sergio Arboleda - Lenguajes de Programación y Traducción
+Docente: Joaquín F. Sánchez
 """
 
 import os
 import sys
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from reportlab.platypus import (
@@ -18,7 +19,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 
 class NumberedCanvas(canvas.Canvas):
-    """Canvas de dos pasadas para calcular dinámicamente el número total de páginas."""
+    """Canvas de dos pasadas para calcular dinámicamente el número total de páginas y encabezados/pies."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._saved_page_states = []
@@ -42,76 +43,75 @@ class NumberedCanvas(canvas.Canvas):
 
         # Encabezado (a partir de página 2)
         if self._pageNumber > 1:
-            self.drawString(50, 755, "DaZe DSL — Guía de Estudio y Preparación de Sustentación")
-            self.drawRightString(562, 755, "Lenguajes de Programación y Traducción")
-            self.setStrokeColor(colors.HexColor("#E2E8F0"))
+            self.drawString(45, 755, "DaZe DSL — Guía de Estudio y Sustentación Final (Fase 3)")
+            self.drawRightString(567, 755, "Lenguajes de Programación y Traducción | U. Sergio Arboleda")
+            self.setStrokeColor(colors.HexColor("#CBD5E0"))
             self.setLineWidth(0.75)
-            self.line(50, 748, 562, 748)
+            self.line(45, 747, 567, 747)
 
         # Pie de página (todas las páginas)
-        self.setStrokeColor(colors.HexColor("#E2E8F0"))
+        self.setStrokeColor(colors.HexColor("#CBD5E0"))
         self.setLineWidth(0.75)
-        self.line(50, 45, 562, 45)
+        self.line(45, 42, 567, 42)
 
-        self.drawString(50, 32, "Universidad Sergio Arboleda — CC & IA | Repositorio: github.com/27saya/proyecto_lenguajes")
+        self.drawString(45, 30, "CC & IA — Repositorio Oficial: github.com/27saya/proyecto_lenguajes")
         page_str = f"Página {self._pageNumber} de {total_pages}"
-        self.drawRightString(562, 32, page_str)
+        self.drawRightString(567, 30, page_str)
         self.restoreState()
 
 
 def crear_guia_estudio_pdf(ruta_salida: str):
+    # Márgenes de 45 pt -> Ancho disponible = 612 - 90 = 522 pt
     doc = SimpleDocTemplate(
         ruta_salida,
         pagesize=letter,
-        leftMargin=50,
-        rightMargin=50,
-        topMargin=55,
-        bottomMargin=55,
+        leftMargin=45,
+        rightMargin=45,
+        topMargin=50,
+        bottomMargin=50,
     )
 
     styles = getSampleStyleSheet()
 
-    # Colores corporativos del documento
+    # Colores institucionales y de diseño
     c_primary = colors.HexColor("#1A365D")    # Azul institucional oscuro
     c_secondary = colors.HexColor("#2B6CB0")  # Azul medio
-    c_accent = colors.HexColor("#C53030")     # Rojo acento
-    c_dark = colors.HexColor("#2D3748")       # Texto principal oscuro
+    c_accent = colors.HexColor("#9B2C2C")     # Rojo acento académico
+    c_dark = colors.HexColor("#2D3748")       # Texto principal
     c_light = colors.HexColor("#F7FAFC")      # Fondo claro
-    c_code_bg = colors.HexColor("#EDF2F7")    # Fondo cajas de código
-    c_border = colors.HexColor("#CBD5E0")     # Bordes suaves
+    c_border = colors.HexColor("#CBD5E0")     # Borde suave
+    c_callout_bg = colors.HexColor("#EBF8FF") # Fondo de llamada
+    c_callout_border = colors.HexColor("#3182CE")
 
-    # Estilos de párrafo personalizados
     title_style = ParagraphStyle(
         "DocTitle",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=20,
-        leading=24,
+        fontSize=18,
+        leading=22,
         textColor=c_primary,
-        alignment=0,
-        spaceAfter=4,
+        spaceAfter=3,
     )
 
     subtitle_style = ParagraphStyle(
         "DocSubtitle",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=11,
-        leading=15,
+        fontSize=10.5,
+        leading=14,
         textColor=c_secondary,
-        alignment=0,
-        spaceAfter=12,
+        spaceAfter=10,
     )
 
     h1_style = ParagraphStyle(
         "Heading1_Custom",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=13,
-        leading=17,
+        fontSize=12,
+        leading=16,
         textColor=c_primary,
-        spaceBefore=14,
-        spaceAfter=6,
+        spaceBefore=12,
+        spaceAfter=5,
         keepWithNext=True,
     )
 
@@ -119,11 +119,11 @@ def crear_guia_estudio_pdf(ruta_salida: str):
         "Heading2_Custom",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=10.5,
-        leading=14,
+        fontSize=9.5,
+        leading=13,
         textColor=c_secondary,
-        spaceBefore=8,
-        spaceAfter=4,
+        spaceBefore=6,
+        spaceAfter=3,
         keepWithNext=True,
     )
 
@@ -131,26 +131,26 @@ def crear_guia_estudio_pdf(ruta_salida: str):
         "Body_Custom",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=9,
-        leading=13,
+        fontSize=8.5,
+        leading=12,
         textColor=c_dark,
-        spaceAfter=6,
+        spaceAfter=5,
     )
 
     bullet_style = ParagraphStyle(
         "Bullet_Custom",
         parent=body_style,
-        leftIndent=14,
-        firstLineIndent=-10,
-        spaceAfter=3,
+        leftIndent=12,
+        firstLineIndent=-8,
+        spaceAfter=2.5,
     )
 
     code_style = ParagraphStyle(
         "Code_Custom",
         parent=styles["Normal"],
         fontName="Courier",
-        fontSize=8,
-        leading=10.5,
+        fontSize=7.5,
+        leading=9.5,
         textColor=colors.HexColor("#1A202C"),
     )
 
@@ -158,8 +158,8 @@ def crear_guia_estudio_pdf(ruta_salida: str):
         "Callout_Custom",
         parent=styles["Normal"],
         fontName="Helvetica",
-        fontSize=8.5,
-        leading=12,
+        fontSize=8,
+        leading=11.5,
         textColor=colors.HexColor("#2C5282"),
     )
 
@@ -167,10 +167,10 @@ def crear_guia_estudio_pdf(ruta_salida: str):
         "QuestionTitle",
         parent=styles["Normal"],
         fontName="Helvetica-Bold",
-        fontSize=9.5,
-        leading=13,
+        fontSize=9,
+        leading=12,
         textColor=c_accent,
-        spaceBefore=6,
+        spaceBefore=4,
         spaceAfter=2,
         keepWithNext=True,
     )
@@ -178,12 +178,11 @@ def crear_guia_estudio_pdf(ruta_salida: str):
     story = []
 
     # -------------------------------------------------------------
-    # PORTADA / ENCABEZADO PRINCIPAL
+    # PORTADA Y FICHA TÉCNICA
     # -------------------------------------------------------------
-    story.append(Paragraph("GUÍA INTEGRAL DE ESTUDIO Y SUSTENTACIÓN", title_style))
-    story.append(Paragraph("<b>Proyecto DSL DaZe (.dz)</b> — Lenguaje de Dominio Específico para Analítica Deportiva", subtitle_style))
+    story.append(Paragraph("GUÍA INTEGRAL DE ESTUDIO Y SUSTENTACIÓN — FASE FINAL (3/3)", title_style))
+    story.append(Paragraph("<b>Proyecto DSL DaZe (.dz)</b> — Lenguaje de Dominio Específico para Analítica Deportiva y Ciencia de Datos", subtitle_style))
 
-    # Ficha Técnica en tabla
     ficha_data = [
         [
             Paragraph("<b>Asignatura:</b> Lenguajes de Programación y Traducción", body_style),
@@ -195,322 +194,498 @@ def crear_guia_estudio_pdf(ruta_salida: str):
         ],
         [
             Paragraph("<b>Estudiante / Repositorio:</b> 27saya (github.com/27saya/proyecto_lenguajes)", body_style),
-            Paragraph("<b>Tecnologías:</b> ANTLR4 (Lexer/Parser) + Python 3 (Visitor & Core)", body_style)
+            Paragraph("<b>Entrega:</b> Tercera y última fase (Corte 3 - Producto final)", body_style)
+        ],
+        [
+            Paragraph("<b>Front-End:</b> ANTLR4 (Lexer + Parser LL(*))", body_style),
+            Paragraph("<b>Back-End:</b> Python 3 (Visitor, Core Racoons, CanvasPNG, ML Nativo)", body_style)
         ]
     ]
-    t_ficha = Table(ficha_data, colWidths=[270, 242])
+    t_ficha = Table(ficha_data, colWidths=[261, 261])
     t_ficha.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#F7FAFC")),
         ('BOX', (0,0), (-1,-1), 1, c_border),
         ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor("#E2E8F0")),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-        ('LEFTPADDING', (0,0), (-1,-1), 8),
-        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('LEFTPADDING', (0,0), (-1,-1), 7),
+        ('RIGHTPADDING', (0,0), (-1,-1), 7),
     ]))
     story.append(t_ficha)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 7))
 
-    # Caja de propósito pedagógico
+    # Caja de propósito y estrategia de sustentación
     intro_box = [
         [Paragraph(
-            "<b>¿Cómo utilizar esta guía para preparar la sustentación?</b><br/>"
-            "Este documento consolida la fundamentación teórica, la arquitectura interna del compilador/intérprete, "
-            "las decisiones de diseño, el funcionamiento de nuestro motor de datos propio (<i>racoons</i>) y un banco "
-            "de <b>10 preguntas de simulación (Mock Questions)</b> con las respuestas exactas que evaluará el docente. "
-            "Úsalo para dominar los conceptos clave de análisis léxico, análisis sintáctico descendente, tablas de símbolos "
-            "y evaluación semántica basada en el patrón Visitor.",
+            "<b>Estrategia recomendada para la sustentación final:</b><br/>"
+            "El profesor Joaquín F. Sánchez evaluará la coherencia global entre el diseño sintáctico, la formalidad de la gramática, "
+            "la robustez semántica y la capacidad del compilador/intérprete para ejecutar un flujo completo de ciencia de datos sin dependencias pesadas. "
+            "Estructura tu intervención en cuatro momentos clave: "
+            "<b>(1) Dominio y gramática:</b> Justifica el vocabulario deportivo ergonómico y el orden de precedencia. "
+            "<b>(2) Arquitectura interna:</b> Explica por qué el patrón Visitor y cómo la inyección de contexto de fila resuelve las operaciones en tubería (<code>|&gt;</code>). "
+            "<b>(3) Autonomía algorítmica:</b> Destaca que el motor tabular (<i>racoons</i>), los modelos de Machine Learning (regresión y K-Means) y el renderizador de gráficos (<i>CanvasPNG</i> con tipografía bitmap nativa) fueron desarrollados en Python puro sin pandas, NumPy ni Matplotlib. "
+            "<b>(4) Demostración en vivo:</b> Ejecuta <code>./daze caso_estudio.dz</code> mostrando la salida tabular, los 4 archivos PNG generados con títulos y marcas graduadas, y la suite de 49 pruebas unitarias.",
             callout_style
         )]
     ]
-    t_intro = Table(intro_box, colWidths=[512])
+    t_intro = Table(intro_box, colWidths=[522])
     t_intro.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#EBF8FF")),
+        ('BACKGROUND', (0,0), (-1,-1), c_callout_bg),
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor("#BEE3F8")),
-        ('LINELEFT', (0,0), (0,0), 3.5, c_secondary),
-        ('TOPPADDING', (0,0), (-1,-1), 6),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
-        ('LEFTPADDING', (0,0), (-1,-1), 10),
-        ('RIGHTPADDING', (0,0), (-1,-1), 10),
+        ('LINELEFT', (0,0), (0,0), 3.5, c_callout_border),
+        ('TOPPADDING', (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
+        ('LEFTPADDING', (0,0), (-1,-1), 8),
+        ('RIGHTPADDING', (0,0), (-1,-1), 8),
     ]))
     story.append(t_intro)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------
-    # MÓDULO 1: ARQUITECTURA DEL PROYECTO Y FLUJO DEL COMPILADOR
+    # MÓDULO 1: ARQUITECTURA INTEGRAL Y PIPELINE DEL COMPILADOR
     # -------------------------------------------------------------
-    story.append(Paragraph("Módulo 1: Arquitectura Integral del DSL y Flujo de Procesamiento", h1_style))
+    story.append(Paragraph("Módulo 1: Arquitectura Integral del DSL y Ciclo de Ejecución", h1_style))
     story.append(Paragraph(
-        "DaZe es un lenguaje de dominio específico (DSL) declarativo y reproducible orientado a analistas de rendimiento, "
-        "entrenadores y directores técnicos. Permite transformar datos de plantillas deportivas, telemetría de sensores GPS "
-        "y academias juveniles mediante tuberías (pipelines <code>|&gt;</code>) sin requerir código de propósito general.",
+        "DaZe es un lenguaje de dominio específico (DSL) declarativo, modular y reproducible diseñado para analistas de rendimiento, "
+        "cuerpos técnicos y directores deportivos. Su arquitectura desacopla estrictamente cada una de las fases del proceso de traducción y ejecución:",
         body_style
     ))
 
-    # Tabla de componentes
     comp_data = [
-        [Paragraph("<b>Componente</b>", body_style), Paragraph("<b>Módulo / Archivo</b>", body_style), Paragraph("<b>Función Teórica y Práctica</b>", body_style)],
-        [Paragraph("Front-End Léxico", body_style), Paragraph("<code>grammar/DaZeLexer.g4</code>", code_style), Paragraph("Convierte el flujo de caracteres en tokens deportivos sin guiones bajos (ej. <code>desviar</code>, <code>fichar</code>, <code>convocar</code>).", body_style)],
-        [Paragraph("Front-End Sintáctico", body_style), Paragraph("<code>grammar/DaZeParser.g4</code>", code_style), Paragraph("Analizador sintáctico descendente LL(*) generado por ANTLR4; construye el árbol de análisis (Parse Tree).", body_style)],
-        [Paragraph("Tabla de Símbolos", body_style), Paragraph("<code>src/semantic/tabla_simbolos.py</code>", code_style), Paragraph("Estructura jerárquica con ámbitos (global y local); valida identificadores y esquemas de columnas en plantillas.", body_style)],
-        [Paragraph("Motor Semántico (Visitor)", body_style), Paragraph("<code>src/semantic/visitor.py</code>", code_style), Paragraph("Recorre el AST; evalúa expresiones, encadena pipelines fila a fila e inyecta el contexto de fila dinámico.", body_style)],
-        [Paragraph("Librería Propia (Core)", body_style), Paragraph("<code>src/core/racoons.py</code><br/><code>src/core/estadistica.py</code>", code_style), Paragraph("Librería nativa en Python puro (<i>racoons</i> y <i>estadistica</i>) para manipulación tabular 2D y cálculos descriptivos sin dependencias externas.", body_style)],
-        [Paragraph("Diagnóstico de Errores", body_style), Paragraph("<code>src/errors.py</code>", code_style), Paragraph("Reporte unificado de errores léxicos, sintácticos y semánticos con línea, columna y mensaje comprensible en español.", body_style)],
+        [Paragraph("<b>Capa Arquitectural</b>", body_style), Paragraph("<b>Módulo / Archivos</b>", body_style), Paragraph("<b>Función Técnica y Algorítmica</b>", body_style)],
+        [
+            Paragraph("<b>Front-End Léxico</b>", body_style),
+            Paragraph("<code>grammar/DaZeLexer.g4</code>", code_style),
+            Paragraph("Convierte el flujo de caracteres del archivo <code>.dz</code> en un flujo estructurado de tokens sin guiones bajos (ej. <code>convocar</code>, <code>descartar</code>, <code>enjuego</code>).", body_style)
+        ],
+        [
+            Paragraph("<b>Front-End Sintáctico</b>", body_style),
+            Paragraph("<code>grammar/DaZeParser.g4</code>", code_style),
+            Paragraph("Analizador sintáctico descendente LL(*) generado con ANTLR4. Construye el árbol de sintaxis abstracta (AST) y resuelve precedencias formales.", body_style)
+        ],
+        [
+            Paragraph("<b>Tabla de Símbolos</b>", body_style),
+            Paragraph("<code>src/semantic/tabla_simbolos.py</code>", code_style),
+            Paragraph("Estructura jerárquica de ámbitos (Scope Tree) para variables escalares, esquemas de columnas en tablas deportivas y firmas de funciones (tácticas).", body_style)
+        ],
+        [
+            Paragraph("<b>Intérprete Semántico</b>", body_style),
+            Paragraph("<code>src/semantic/visitor.py</code>", code_style),
+            Paragraph("Implementación del patrón Visitor (<code>DaZeSemanticVisitor</code>). Evalúa expresiones, administra bucles, controla el flujo condicional e inyecta el contexto de fila dinámico.", body_style)
+        ],
+        [
+            Paragraph("<b>Motor Tabular Propio</b>", body_style),
+            Paragraph("<code>src/core/racoons.py</code><br/><code>src/core/estadistica.py</code>", code_style),
+            Paragraph("Estructuras de datos bidimensionales en Python puro (<code>Tabla</code> y <code>GrupoTabla</code>). Implementa proyección, filtrado, ordenamiento, agrupación hash y cálculo estadístico sin pandas.", body_style)
+        ],
+        [
+            Paragraph("<b>Estructuras Lineales</b>", body_style),
+            Paragraph("<code>src/core/estructuras.py</code>", code_style),
+            Paragraph("Implementación nativa de pilas (LIFO) y colas (FIFO) integradas al lenguaje para el seguimiento cronológico y táctico de jugadores.", body_style)
+        ],
+        [
+            Paragraph("<b>Machine Learning Nativo</b>", body_style),
+            Paragraph("<code>src/core/modelos.py</code><br/><code>src/core/matematica.py</code>", code_style),
+            Paragraph("Algoritmos de Regresión Lineal por Mínimos Cuadrados Ordinarios (MCO), correlación de Pearson, coeficiente $R^2$ y agrupamiento no supervisado K-Means en 2D sin bibliotecas externas.", body_style)
+        ],
+        [
+            Paragraph("<b>Renderizador Gráfico</b>", body_style),
+            Paragraph("<code>src/core/visualizador.py</code>", code_style),
+            Paragraph("Motor de renderizado binario PNG nativo (<code>CanvasPNG</code> con compresión zlib) y tipografía de mapa de bits 5x7 ASCII pura para títulos, ejes, cuadrículas y etiquetas numéricas.", body_style)
+        ],
+        [
+            Paragraph("<b>CLI y Diagnóstico</b>", body_style),
+            Paragraph("<code>src/cli.py</code><br/><code>daze</code> (ejecutable)", code_style),
+            Paragraph("Interfaz de línea de comandos con modo interactivo (REPL), ejecución por lotes y captura unificada de errores léxicos, sintácticos y semánticos con línea y columna.", body_style)
+        ]
     ]
-    t_comp = Table(comp_data, colWidths=[110, 140, 262])
+    t_comp = Table(comp_data, colWidths=[105, 135, 282])
     t_comp.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#2B6CB0")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('GRID', (0,0), (-1,-1), 0.5, c_border),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor("#F7FAFC")]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-        ('LEFTPADDING', (0,0), (-1,-1), 6),
-        ('RIGHTPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('LEFTPADDING', (0,0), (-1,-1), 5),
+        ('RIGHTPADDING', (0,0), (-1,-1), 5),
     ]))
     story.append(t_comp)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------
-    # MÓDULO 2: FRONT-END — LÉXICO, SINTÁCTICO Y PRECEDENCIA
+    # MÓDULO 2: FRONT-END LÉXICO Y SINTÁCTICO
     # -------------------------------------------------------------
-    story.append(Paragraph("Módulo 2: Especificación Léxica, Gramática EBNF y Precedencia", h1_style))
+    story.append(Paragraph("Módulo 2: Especificación Léxica, Gramática EBNF y Precedencia en ANTLR4", h1_style))
     story.append(Paragraph(
-        "El análisis léxico y sintáctico fue especificado formalmente en notación BNF/EBNF e implementado mediante ANTLR4. "
-        "Las decisiones más importantes tomadas en esta etapa fueron:",
+        "El front-end fue formalizado en notación BNF/EBNF y compilado con ANTLR4 generando analizadores en Python 3:",
         body_style
     ))
-    story.append(Paragraph("• <b>Eliminación de guiones bajos en el DSL:</b> Se diseñó un léxico ergonómico donde operaciones como la desviación estándar se escriben <code>desviar</code> (en vez de <code>desv_std</code>), el tratamiento de nulos se nombra <code>sanear</code> o <code>recuperar</code>, y la depuración de duplicados <code>depurar</code> o <code>limpiar</code>.", bullet_style))
-    story.append(Paragraph("• <b>Jerarquía y Precedencia de Expresiones:</b> ANTLR4 resuelve la precedencia según el orden en que se declaran las alternativas en la regla <code>expr</code>. Se ordenaron de mayor a menor precedencia: Potencia (<code>^</code>, asociativa por derecha) → Operadores unarios (<code>+</code>, <code>-</code>, <code>no</code>) → Multiplicativos (<code>*</code>, <code>/</code>, <code>%</code>) → Aditivos (<code>+</code>, <code>-</code>) → Relacionales (<code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>) → Igualdad (<code>==</code>, <code>!=</code>) → Lógica Y (<code>y</code>) → Lógica O (<code>o</code>).", bullet_style))
-    story.append(Paragraph("• <b>Resolución de Ambigüedad en Sentencias:</b> En la regla <code>sentencia</code>, las instrucciones especializadas <code>guardar_stmt</code> (<code>archivar</code>) y <code>mostrar_stmt</code> (<code>proyectar</code>) se ubicaron <b>antes</b> de <code>llamada_stmt</code>. Esto previene que ANTLR las interprete erróneamente como llamadas a tácticas genéricas.", bullet_style))
-    story.append(Spacer(1, 10))
+    story.append(Paragraph("• <b>Léxico Deportivo y Ergonómico:</b> Se eliminaron guiones bajos de todos los identificadores del sistema: <code>desviar</code> (desviación estándar), <code>sanear</code> (imputación de nulos), <code>depurar</code> (deduplicación), <code>archivar</code> (exportar CSV), <code>proyectar</code> (mostrar en consola) y <code>pizarra</code> (graficar).", bullet_style))
+    story.append(Paragraph("• <b>Jerarquía y Precedencia de Operadores:</b> ANTLR4 resuelve la precedencia según el orden vertical de las alternativas en la regla <code>expr</code>. El orden formal implementado es: Potencia (<code>^</code>, asociatividad por derecha con <code>&lt;assoc=right&gt;</code>) → Operadores unarios (<code>+</code>, <code>-</code>, <code>no</code>) → Multiplicativos (<code>*</code>, <code>/</code>, <code>%</code>) → Aditivos (<code>+</code>, <code>-</code>) → Relacionales (<code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>) → Igualdad (<code>==</code>, <code>!=</code>) → Lógicos conjuntivos (<code>y</code>) → Lógicos disyuntivos (<code>o</code>).", bullet_style))
+    story.append(Paragraph("• <b>Resolución de Ambigüedades Sintácticas:</b> En la regla <code>sentencia</code>, instrucciones especializadas como <code>guardar_stmt</code> (<code>archivar</code>), <code>mostrar_stmt</code> (<code>proyectar</code>) y <code>graficar_stmt</code> (<code>pizarra</code>) se declararon <b>antes</b> de <code>llamada_stmt</code>. Esto evita que el analizador descendente consuma estas palabras clave como identificadores de tácticas genéricas.", bullet_style))
+    story.append(Paragraph("• <b>Manejo de Errores Sintácticos:</b> Se integró <code>DaZeErrorListener</code> para interceptar discrepancias léxicas o sintácticas antes de la fase de ejecución, emitiendo mensajes de diagnóstico en español con ubicación precisa.", bullet_style))
+    story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------
-    # MÓDULO 3: MOTOR PROPIO DE DATOS (RACOONS Y ESTADÍSTICA)
+    # MÓDULO 3: MOTOR TABULAR PROPIO (RACOONS Y ESTADÍSTICA)
     # -------------------------------------------------------------
     story.append(Paragraph("Módulo 3: Motor Propio de Datos (Librerías Racoons y Estadística)", h1_style))
     story.append(Paragraph(
-        "Por indicación docente, <b>no se utilizaron dependencias pesadas de terceros como pandas o numpy</b>. "
-        "En su lugar, se construyó una librería nativa en Python puro dividida en dos módulos:",
+        "Cumpliendo el principio de autonomía algorítmica, <b>no se utilizaron dependencias pesadas de terceros (como pandas o numpy)</b>. "
+        "En su lugar, se desarrollaron módulos nativos con complejidades óptimas:",
         body_style
     ))
 
-    core_info = [
+    core_table = [
+        [Paragraph("<b>Componente</b>", body_style), Paragraph("<b>Estructura Interna</b>", body_style), Paragraph("<b>Operaciones y Algoritmos Implementados</b>", body_style)],
         [
-            Paragraph("<b>Módulo <code>racoons.py</code> (Clase <code>Tabla</code> / <code>racoons</code>)</b>", h2_style),
-            Paragraph("<b>Módulo <code>estadistica.py</code> (Cálculos Descriptivos)</b>", h2_style)
+            Paragraph("<b><code>Tabla</code> (racoons)</b>", body_style),
+            Paragraph("<code>columnas: List[str]</code><br/><code>filas: List[Dict[str, Any]]</code>", code_style),
+            Paragraph(
+                "• <b><code>csvread / csvsave</code>:</b> Parser propio con inferencia de tipos (enteros, flotantes, booleanos y nulos).<br/>"
+                "• <b><code>convocar</code>:</b> Proyección de columnas en tiempo $O(N \\times K)$.<br/>"
+                "• <b><code>descartar</code>:</b> Filtrado de registros en tiempo lineal $O(N)$.<br/>"
+                "• <b><code>contratar</code>:</b> Creación de columnas evaluadas dinámicamente.<br/>"
+                "• <b><code>clasificar</code>:</b> Ordenamiento con clave personalizada y reversibilidad.<br/>"
+                "• <b><code>sanear</code> y <code>depurar</code>:</b> Imputación de nulos y eliminación de duplicados.<br/>"
+                "• <b><code>top</code>:</b> Extracción acotada de las primeras $K$ filas.",
+                body_style
+            )
         ],
         [
+            Paragraph("<b><code>GrupoTabla</code> (Agrupación)</b>", body_style),
+            Paragraph("<code>grupos: Dict[Tuple, List[Dict]]</code>", code_style),
             Paragraph(
-                "• <b>Estructura Interna:</b> Almacena una lista de nombres de columnas y una lista de diccionarios <code>fila = {col: valor}</code>.<br/>"
-                "• <b><code>csvread(ruta)</code>:</b> Parser propio con inferencia de tipos (enteros, flotantes, booleanos <code>verdadero</code>/<code>falso</code> y <code>nulo</code>).<br/>"
-                "• <b><code>csvsave(ruta)</code>:</b> Exportador con creación automática de subdirectorios.<br/>"
-                "• <b>Operaciones:</b> <code>convocar</code> (proyección), <code>descartar</code> (filtrado), <code>contratar</code> (columnas calculadas), <code>rebautizar</code>, <code>clasificar</code>, <code>sanear</code>, <code>depurar</code> y <code>top</code>.<br/>"
-                "• <b><code>alinear</code> + <code>balance</code>:</b> Particiona la tabla mediante <code>GrupoTabla</code> usando tablas hash y aplica agregaciones por grupo.",
+                "• <b><code>alinear(columnas)</code>:</b> Particiona los registros en una tabla hash indexada por tuplas de valores únicos de las columnas clave.<br/>"
+                "• <b><code>balance(agregaciones)</code>:</b> Aplica funciones descriptivas sobre cada partición y consolida una nueva <code>Tabla</code> en $O(N)$.",
                 body_style
-            ),
+            )
+        ],
+        [
+            Paragraph("<b><code>estadistica.py</code></b>", body_style),
+            Paragraph("Algoritmos numéricos puros", code_style),
             Paragraph(
-                "• <b>Python Puro:</b> Implementación de algoritmos numéricos sin librerías externas.<br/>"
-                "• <b><code>suma(valores)</code>:</b> Acumulador que omite nulos de forma segura.<br/>"
-                "• <b><code>media(valores)</code>:</b> Promedio aritmético.<br/>"
-                "• <b><code>mediana(valores)</code>:</b> Ordenamiento y selección del elemento central o promedio de dos centrales.<br/>"
-                "• <b><code>minimo(valores)</code> / <code>maximo(valores)</code>:</b> Extremos de una serie deportiva.<br/>"
-                "• <b><code>desviar(valores)</code>:</b> Desviación estándar muestral con divisor $(n-1)$.<br/>"
-                "• <b><code>contar(valores)</code>:</b> Conteo de registros válidos.",
+                "• <b><code>suma</code> / <code>contar</code>:</b> Acumuladores con omisión segura de valores nulos.<br/>"
+                "• <b><code>media</code>:</b> Promedio aritmético $\\bar{x} = \\frac{1}{n}\\sum x_i$.<br/>"
+                "• <b><code>mediana</code>:</b> Ordenamiento y selección del centroide estadístico.<br/>"
+                "• <b><code>desviar</code>:</b> Desviación estándar muestral con divisor $(n-1)$.<br/>"
+                "• <b><code>minimo</code> / <code>maximo</code>:</b> Detección de extremos en series numéricas.",
                 body_style
             )
         ]
     ]
-    t_core = Table(core_info, colWidths=[256, 256])
+    t_core = Table(core_table, colWidths=[105, 140, 277])
     t_core.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#F7FAFC")),
-        ('BOX', (0,0), (-1,-1), 1, c_border),
-        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor("#E2E8F0")),
-        ('TOPPADDING', (0,0), (-1,-1), 6),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
-        ('LEFTPADDING', (0,0), (-1,-1), 8),
-        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#2B6CB0")),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('GRID', (0,0), (-1,-1), 0.5, c_border),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor("#F7FAFC")]),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('LEFTPADDING', (0,0), (-1,-1), 5),
+        ('RIGHTPADDING', (0,0), (-1,-1), 5),
     ]))
     story.append(t_core)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------
-    # MÓDULO 4: ANÁLISIS SEMÁNTICO Y TABLA DE SÍMBOLOS
+    # MÓDULO 4: TABLA DE SÍMBOLOS Y EVALUACIÓN SEMÁNTICA
     # -------------------------------------------------------------
-    story.append(Paragraph("Módulo 4: Tabla de Símbolos, Ámbitos y Comprobaciones Semánticas", h1_style))
+    story.append(Paragraph("Módulo 4: Sistema de Tipos, Ámbitos y Tabla de Símbolos Jerárquica", h1_style))
     story.append(Paragraph(
-        "La fase semántica verifica que los programas sintácticamente correctos tengan sentido lógico y respeten las reglas del dominio:",
+        "La tabla de símbolos garantiza la consistencia del programa antes y durante la ejecución:",
         body_style
     ))
-    story.append(Paragraph("• <b>Estructura de la Tabla de Símbolos:</b> Implementada como un árbol de ámbitos (scope tree) donde cada ámbito posee un diccionario de <code>Simbolo</code> y un puntero a su ámbito <code>padre</code>.", bullet_style))
-    story.append(Paragraph("• <b>Esquemas en Símbolos Tabulares:</b> Cuando una variable almacena una <code>Tabla</code>, el símbolo registra la lista de columnas disponibles. Esto permite validar rápidamente si una columna existe antes de ejecutar proyecciones o gráficos.", bullet_style))
-    story.append(Paragraph("• <b>Ámbitos Locales en Tácticas:</b> Al invocar una <code>tactica</code> (función deportiva), el intérprete crea un nuevo ámbito hijo, asociando los parámetros formales con los argumentos evaluados y aislando las variables locales del entorno global.", bullet_style))
-    story.append(Paragraph("• <b>Diagnósticos Semánticos:</b> Se interceptan variables no declaradas, columnas inexistentes en la plantilla, operaciones aritméticas con tipos incompatibles (ej. restar texto de un número) y divisiones por cero.", bullet_style))
-    story.append(Spacer(1, 10))
+    story.append(Paragraph("• <b>Árbol de Ámbitos (Scope Tree):</b> Cada bloque de código delimitado o llamada a función crea un ámbito local conectado a su ámbito padre. Al buscar una variable o táctica, el evaluador asciende por la cadena estática de padres hasta el entorno global.", bullet_style))
+    story.append(Paragraph("• <b>Símbolos con Esquemas de Columnas:</b> Cuando un identificador contiene una <code>Tabla</code>, el símbolo asocia la lista de columnas válidas. Esto permite validar semánticamente si una columna existe antes de proyectar, filtrar o graficar.", bullet_style))
+    story.append(Paragraph("• <b>Comprobaciones Semánticas Estrictas:</b> Se detectan e interrumpen limpiamente: (1) uso de identificadores no declarados, (2) columnas inexistentes en pipelines, (3) incompatibilidad de tipos en operaciones aritméticas (ej. sumar número con texto), y (4) divisiones por cero.", bullet_style))
+    story.append(Paragraph("• <b>Aislamiento en Tácticas y Señal de Retorno:</b> Las tácticas ejecutan sus parámetros en un nuevo ámbito local. La instrucción <code>resultado expr;</code> lanza una excepción controlada <code>ReturnSignal(valor)</code> que desenrolla la pila de llamadas hasta el llamador de forma inmediata y limpia.", bullet_style))
+    story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------
-    # MÓDULO 5: EL INTÉRPRETE VISITOR (PATRÓN VISITOR DE ANTLR4)
+    # MÓDULO 5: EL INTÉRPRETE VISITOR Y CONTEXTO DE FILA
     # -------------------------------------------------------------
     story.append(Paragraph("Módulo 5: Intérprete Semántico Basado en el Patrón Visitor", h1_style))
     story.append(Paragraph(
-        "La clase <code>DaZeSemanticVisitor</code> hereda de <code>DaZeParserVisitor</code> y controla de forma explícita el recorrido del AST:",
+        "<code>DaZeSemanticVisitor</code> hereda de <code>DaZeParserVisitor</code> y comanda el recorrido del árbol de sintaxis abstracta (AST):",
         body_style
     ))
 
-    visitor_table = [
-        [Paragraph("<b>Aspecto Técnico</b>", body_style), Paragraph("<b>Mecanismo Implementado en DaZe</b>", body_style)],
+    visitor_info = [
+        [Paragraph("<b>Decisión de Diseño</b>", body_style), Paragraph("<b>Mecanismo Técnico en DaZe</b>", body_style)],
         [
-            Paragraph("<b>Visitor vs Listener</b>", body_style),
-            Paragraph("El <b>Visitor</b> permite controlar cuándo y cuántas veces visitar los nodos hijos y retornar valores directamente. El Listener realiza un recorrido pasivo y ciego (DFS automático) que dificulta evaluar expresiones dinámicas y condicionales.", body_style)
+            Paragraph("<b>¿Por qué Visitor y no Listener?</b>", body_style),
+            Paragraph("El <b>Visitor</b> permite controlar cuándo y cuántas veces visitar los nodos hijos y retornar valores directamente. El <b>Listener</b> realiza un recorrido pasivo y automático (DFS ciego) sin retorno de valores, lo cual impide evaluar expresiones compuestas y saltar bloques en condicionales y bucles.", body_style)
         ],
         [
             Paragraph("<b>Inyección de Contexto de Fila</b>", body_style),
-            Paragraph("En <code>descartar</code> y <code>contratar</code>, el visitor evalúa expresiones fila a fila estableciendo <code>self.contexto_fila = fila</code>. Al resolver un identificador, busca primero en las columnas de la fila actual y luego en la tabla de símbolos.", body_style)
+            Paragraph("En <code>descartar</code> y <code>contratar</code>, el Visitor itera fila por fila asignando <code>self.contexto_fila = fila</code>. Al resolver un identificador en <code>visitExprIdentificador</code>, busca primero en las columnas de la fila actual; si no existe, busca en la tabla de símbolos del programa.", body_style)
         ],
         [
             Paragraph("<b>Control de Flujo Condicional</b>", body_style),
-            Paragraph("En <code>si (expr) { ... } sino { ... }</code>, evalúa la condición booleana y solo visita las sentencias del bloque correspondiente, evitando ejecuciones innecesarias.", body_style)
-        ],
-        [
-            Paragraph("<b>Retorno de Funciones (<code>resultado</code>)</b>", body_style),
-            Paragraph("Se implementa mediante una excepción de señal (<code>ReturnSignal(valor)</code>) que desenrolla inmediatamente la pila de llamadas hasta el receptor de la táctica.", body_style)
-        ],
-        [
-            Paragraph("<b>Validación de Pizarras (Visualización)</b>", body_style),
-            Paragraph("En la sentencia <code>pizarra</code> se comprueba semánticamente que el dataset exista y que las variables asignadas a <code>eje_x</code> y <code>eje_y</code> correspondan a columnas válidas de la tabla, cumpliendo estrictamente con el alcance actual.", body_style)
-        ],
+            Paragraph("En <code>si (condicion) { ... } sino { ... }</code>, evalúa la condición booleana y solo visita las sentencias de la rama activa, evitando evaluaciones innecesarias o efectos secundarios indeseados.", body_style)
+        ]
     ]
-    t_vis = Table(visitor_table, colWidths=[150, 362])
+    t_vis = Table(visitor_info, colWidths=[150, 372])
     t_vis.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#2B6CB0")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('GRID', (0,0), (-1,-1), 0.5, c_border),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor("#F7FAFC")]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-        ('LEFTPADDING', (0,0), (-1,-1), 6),
-        ('RIGHTPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('LEFTPADDING', (0,0), (-1,-1), 5),
+        ('RIGHTPADDING', (0,0), (-1,-1), 5),
     ]))
     story.append(t_vis)
-    story.append(Spacer(1, 14))
+    story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------
-    # MÓDULO 6: CASOS DE ESTUDIO Y RESULTADOS DE PRUEBA
+    # MÓDULO 6: ESTRUCTURAS DE DATOS LINEALES Y BUCLES (FASE 3)
     # -------------------------------------------------------------
-    story.append(Paragraph("Módulo 6: Casos de Estudio Verificados y Suite de Pruebas", h1_style))
+    story.append(Paragraph("Módulo 6: Extensiones Avanzadas de Fase 3: Estructuras Lineales y Bucles", h1_style))
     story.append(Paragraph(
-        "El proyecto cuenta con <b>40 pruebas unitarias e integración pasando al 100%</b> y tres flujos aplicados a datos reales:",
+        "En la tercera fase se expandieron las capacidades de programación estructurada y gestión secuencial de datos:",
         body_style
     ))
-    story.append(Paragraph("1. <b><code>correcto_ventas.dz</code>:</b> Procesa <code>plantilla_temporada.csv</code>, filtra jugadores aptos, calcula rendimiento e impacto, genera balance por posición y exporta a <code>salidas/resumenposiciones.csv</code>.", bullet_style))
-    story.append(Paragraph("2. <b><code>correcto_sensores.dz</code>:</b> Carga telemetría GPS (<code>gps_rendimiento.csv</code>), evalúa la táctica condicional <code>alertasobrecarga</code>, calcula gasto calórico e índice de desgaste y exporta a <code>salidas/telemetrialimpia.csv</code>.", bullet_style))
-    story.append(Paragraph("3. <b><code>correcto_estudiantes.dz</code>:</b> Evalúa notas académicas y físicas de canteranos (<code>academia_juvenil.csv</code>), clasifica por promedio general y exporta el balance por categoría a <code>salidas/balancecantera.csv</code>.", bullet_style))
-    story.append(Paragraph("4. <b>Pruebas de Diagnóstico Negativo:</b> Comprobación de errores con <code>incorrecto_semantico_variable.dz</code>, <code>incorrecto_semantico_columna.dz</code> e <code>incorrecto_semantico_tipos.dz</code>.", bullet_style))
-    story.append(Spacer(1, 10))
-    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#CBD5E0"), spaceBefore=8, spaceAfter=14))
-    story.append(Paragraph("Módulo 7: Banco de Preguntas de Sustentación (Mock Questions)", h1_style))
-    story.append(Paragraph("Preguntas típicas y retadoras del docente Joaquín F. Sánchez con respuestas modelo y justificación técnica.", subtitle_style))
+    story.append(Paragraph("• <b>Estructuras Lineales Nativas:</b> Se incorporaron tipos de datos abstractos sin bibliotecas externas:<br/>"
+                           "- <b><code>pila</code> (LIFO):</b> Permite <code>apilar(item)</code>, <code>desapilar()</code>, <code>cima()</code> y <code>longitud()</code>. Utilizada en analítica deportiva para retrocesos tácticos o historiales recientes de jugadas.<br/>"
+                           "- <b><code>cola</code> (FIFO):</b> Permite <code>encolar(item)</code>, <code>desencolar()</code>, <code>frente()</code> y <code>longitud()</code>. Empleada para el procesamiento secuencial de turnos de entrenamiento o telemetría cronológica.", bullet_style))
+    story.append(Paragraph("• <b>Bucle Condicional <code>enjuego (condicion) { ... }</code>:</b> Estructura de control iterativa tipo <i>while</i>. El Visitor evalúa dinámicamente la condición booleana y repite la visita del cuerpo de sentencias mientras permanezca verdadera.", bullet_style))
+    story.append(Paragraph("• <b>Bucle Iterativo <code>ronda (variable en coleccion) { ... }</code>:</b> Estructura de control tipo <i>for-in</i>. Recorre elementos de listas o filas de una tabla, inyectando la variable de iteración en el ámbito activo durante cada ciclo.", bullet_style))
+    story.append(Spacer(1, 8))
 
-    # Lista de preguntas y respuestas
+    # -------------------------------------------------------------
+    # MÓDULO 7: MACHINE LEARNING Y MODELADO CIENTÍFICO NATIVO
+    # -------------------------------------------------------------
+    story.append(Paragraph("Módulo 7: Modelos Estadísticos y Machine Learning en Python Puro", h1_style))
+    story.append(Paragraph(
+        "El compilador incorpora modelos analíticos avanzados programados matemáticamente desde cero (<code>src/core/modelos.py</code> y <code>matematica.py</code>) sin NumPy ni Scikit-learn:",
+        body_style
+    ))
+
+    ml_data = [
+        [Paragraph("<b>Modelo / Algoritmo</b>", body_style), Paragraph("<b>Fundamento Matemático Implementado</b>", body_style), Paragraph("<b>Aplicación en DaZe</b>", body_style)],
+        [
+            Paragraph("<b>Regresión Lineal MCO</b>", body_style),
+            Paragraph("Mínimos Cuadrados Ordinarios:<br/>"
+                      "Pendiente: $m = \\frac{n\\sum xy - \\sum x \\sum y}{n\\sum x^2 - (\\sum x)^2}$<br/>"
+                      "Intercepto: $b = \\bar{y} - m\\bar{x}$<br/>"
+                      "Predicción: $\\hat{y} = m \\cdot x + b$", code_style),
+            Paragraph("Estimación continua de variables deportivas (ej. proyección de goles esperados o fatiga muscular según minutos jugados).", body_style)
+        ],
+        [
+            Paragraph("<b>Correlación y Bondad de Ajuste</b>", body_style),
+            Paragraph("Pearson: $r = \\frac{Cov(x,y)}{\\sigma_x \\sigma_y}$<br/>"
+                      "Bondad: $R^2 = r^2$ (proporción de varianza explicada).", code_style),
+            Paragraph("Evaluación de la fuerza y dirección de la relación entre variables de telemetría y rendimiento ofensivo.", body_style)
+        ],
+        [
+            Paragraph("<b>K-Means Clustering (2D)</b>", body_style),
+            Paragraph("Agrupamiento no supervisado:<br/>"
+                      "1. Inicialización determinista de $K$ centroides.<br/>"
+                      "2. Asignación por distancia euclidiana: $d(p, c) = \\sqrt{(p_x - c_x)^2 + (p_y - c_y)^2}$.<br/>"
+                      "3. Recálculo del centroide promediando coordenadas del grupo hasta convergencia.", code_style),
+            Paragraph("Segmentación táctica de futbolistas en 3 perfiles (ej. titulares de alto impacto, revulsivos estratégicos y juveniles en formación).", body_style)
+        ]
+    ]
+    t_ml = Table(ml_data, colWidths=[110, 212, 200])
+    t_ml.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#2B6CB0")),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('GRID', (0,0), (-1,-1), 0.5, c_border),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor("#F7FAFC")]),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+        ('LEFTPADDING', (0,0), (-1,-1), 5),
+        ('RIGHTPADDING', (0,0), (-1,-1), 5),
+    ]))
+    story.append(t_ml)
+    story.append(Spacer(1, 8))
+
+    # -------------------------------------------------------------
+    # MÓDULO 8: MOTOR DE VISUALIZACIÓN PNG Y TIPOGRAFÍA BITMAP
+    # -------------------------------------------------------------
+    story.append(Paragraph("Módulo 8: Motor de Visualización PNG Nativo y Tipografía de Mapa de Bits", h1_style))
+    story.append(Paragraph(
+        "La generación gráfica se realiza directamente en binario puro (<code>src/core/visualizador.py</code>), "
+        "creando imágenes PNG válidas sin Pillow, Matplotlib ni dependencias de sistema:",
+        body_style
+    ))
+    story.append(Paragraph("• <b>Estructura Binaria del Archivo PNG:</b><br/>"
+                           "1. <b>Firma mágica:</b> 8 bytes estándar <code>\\x89PNG\\r\\n\\x1a\\n</code>.<br/>"
+                           "2. <b>Chunk IHDR:</b> Define ancho (640 px), alto (420 px), profundidad (8 bits por canal) y modo de color RGB (tipo 2).<br/>"
+                           "3. <b>Filtros y Scanlines:</b> Cada fila horizontal de 640 píxeles es precedida por el byte de filtro <code>0x00</code> (filtro None).<br/>"
+                           "4. <b>Chunk IDAT:</b> Comprime el flujo de píxeles RGB usando el algoritmo DEFLATE mediante <code>zlib.compress(datos, level=6)</code>.<br/>"
+                           "5. <b>Chunk IEND:</b> Marca de finalización con verificación CRC32 obligatoria.", bullet_style))
+    story.append(Paragraph("• <b>Tipografía Nativa de Mapa de Bits (ASCII 5x7):</b> Para asegurar que las imágenes contengan títulos, nombres de jugadores y valores numéricos claros, se embebió una matriz binaria para los 95 caracteres ASCII imprimibles. El método <code>texto(x, y, txt, color, escala)</code> rasteriza cada glifo píxel a píxel, y <code>texto_centrado(y, txt, color, escala=2)</code> centra títulos con tamaño doble.", bullet_style))
+    story.append(Paragraph("• <b>Marcas de Graduación y Guías de Lectura:</b> Las pizarras incluyen 5 marcas de referencia en el eje Y (0%, 25%, 50%, 75%, 100% del valor máximo), líneas punteadas horizontales (<code>linea_punteada</code>), etiquetas de categorías en el eje X y valores numéricos exactos sobre cada barra o punto.", bullet_style))
+    story.append(Paragraph("• <b>Cuatro Tipos de Pizarras Soportadas:</b><br/>"
+                           "1. <code>barras</code>: Comparación de métricas categóricas con valores numéricos y nombres alineados.<br/>"
+                           "2. <code>dispersion</code>: Proyección bivariada con ejes etiquetados y valores mínimos, medios y máximos.<br/>"
+                           "3. <code>histograma</code>: Distribución de frecuencias con cálculo automático de intervalos (bins) y conteo sobre cada columna.<br/>"
+                           "4. <code>lineas</code> (y <code>caja</code>): Tendencias de rendimiento individual y curvas de progresión.", bullet_style))
+    story.append(Spacer(1, 8))
+
+    # -------------------------------------------------------------
+    # MÓDULO 9: CLI, REPL Y DIAGNÓSTICO
+    # -------------------------------------------------------------
+    story.append(Paragraph("Módulo 9: Interfaz de Línea de Comandos (CLI) y Entorno Interactivo (REPL)", h1_style))
+    story.append(Paragraph(
+        "El punto de entrada unificado <code>./daze</code> (enlazado a <code>src/cli.py</code>) detecta automáticamente el entorno virtual "
+        "y ofrece una experiencia completa de desarrollo:",
+        body_style
+    ))
+    story.append(Paragraph("• <b>Ejecución por Lotes:</b> <code>./daze caso_estudio.dz</code> procesa el programa, reporta avances y exporta resultados CSV y PNG.", bullet_style))
+    story.append(Paragraph("• <b>Consola Interactiva (REPL):</b> <code>./daze --interactivo</code> (o <code>-i</code>) permite declarar variables, ejecutar tácticas y probar transformaciones en tiempo real con comandos como <code>ayuda</code>, <code>variables</code>, <code>limpiar</code> y <code>salir</code>.", bullet_style))
+    story.append(Paragraph("• <b>Diagnóstico de Errores:</b> Intercepta excepciones y presenta mensajes comprensibles en español indicando el archivo, la línea y la columna exacta de cualquier fallo léxico, sintáctico o semántico.", bullet_style))
+    story.append(Spacer(1, 8))
+
+    # -------------------------------------------------------------
+    # MÓDULO 10: CASO DE ESTUDIO OFICIAL Y SUITE DE PRUEBAS
+    # -------------------------------------------------------------
+    story.append(Paragraph("Módulo 10: Caso de Estudio Oficial (caso_estudio.dz) y Suite de Pruebas", h1_style))
+    story.append(Paragraph(
+        "El proyecto fue validado de forma integral mediante un caso de estudio real en analítica deportiva y una rigurosa suite de pruebas:",
+        body_style
+    ))
+    story.append(Paragraph("• <b>Flujo en 5 Etapas del Caso de Estudio (<code>caso_estudio.dz</code>):</b><br/>"
+                           "1. <b>Carga:</b> Lee <code>plantilla_temporada.csv</code> (15 futbolistas profesionales con minutos, goles, asistencias y distancia).<br/>"
+                           "2. <b>Transformación:</b> Filtra jugadores aptos y calcula <code>contribucion = goles + asistencias</code> y <code>desgaste_minuto</code>.<br/>"
+                           "3. <b>Agrupación:</b> Particiona por <code>posicion</code> (<code>alinear</code>) y resume con <code>balance</code> (total de goles, media de asistencias, mediana de minutos y desviación estándar), archivando en <code>salidas/resumen_posiciones.csv</code>.<br/>"
+                           "4. <b>Machine Learning Puro:</b> Calcula la correlación de Pearson ($r=0.525$), la pendiente y el intercepto de regresión lineal para estimar goles esperados ($4.42$ goles a los 1000 minutos) y aplica K-Means para clasificar a los jugadores en 3 grupos tácticos.<br/>"
+                           "5. <b>Visualización:</b> Renderiza y exporta 4 pizarras PNG legibles en <code>salidas/</code> con títulos, cuadrículas y etiquetas.", bullet_style))
+    story.append(Paragraph("• <b>Batería de Pruebas de Regresión:</b> <b>49 pruebas unitarias y de integración pasando al 100%</b> en menos de 0.3 segundos, cubriendo lexer, parser, semántica, pipeline, estructuras de datos, ML y generación de PNG con texto bitmap.", bullet_style))
+    story.append(Spacer(1, 8))
+
+    # -------------------------------------------------------------
+    # MÓDULO 11: BANCO EXHAUSTIVO DE PREGUNTAS (MOCK QUESTIONS)
+    # -------------------------------------------------------------
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#CBD5E0"), spaceBefore=6, spaceAfter=10))
+    story.append(Paragraph("Módulo 11: Banco Exhaustivo de Preguntas de Sustentación (Mock Questions)", h1_style))
+    story.append(Paragraph("Preguntas clave que formulará el docente Joaquín F. Sánchez, con justificación conceptual y respuesta técnica modelo.", subtitle_style))
+
     preguntas = [
         (
             "Pregunta 1: ¿Por qué eligieron el patrón Visitor sobre el Listener para implementar la semántica y ejecución?",
-            "Evaluar el dominio de los dos mecanismos principales de recorrido de árboles en ANTLR4 y la justificación técnica de la elección.",
-            "Elegimos el patrón Visitor porque nos otorga <b>control total y explícito sobre el flujo de navegación del árbol</b>. "
-            "A diferencia del Listener, que es guiado ciegamente por un caminador pasivo (<i>ParseTreeWalker</i>) que visita todos los nodos en DFS sin retornar valores, "
-            "el Visitor permite que cada método visitante retorne el resultado de su evaluación. Esto es crucial en nuestro DSL para: "
-            "(1) evaluar expresiones compuestas y propagar sus valores hacia arriba; (2) controlar estructuras de decisión como <code>si</code>/<code>sino</code> ejecutando únicamente la rama activa; "
-            "y (3) evaluar subárboles de expresiones de forma iterativa fila por fila durante las operaciones <code>contratar</code> y <code>descartar</code>.",
+            "Dominio de los patrones de recorrido de árboles en compiladores y justificación técnica.",
+            "Elegimos el patrón Visitor porque nos otorga <b>control total y explícito sobre la navegación del árbol (AST)</b>. "
+            "A diferencia del Listener, que es guiado ciegamente por un caminador pasivo (<i>ParseTreeWalker</i>) en recorrido DFS sin retornar valores, "
+            "el Visitor permite que cada método visitante retorne el resultado de su evaluación. Esto es fundamental en DaZe para: "
+            "(1) evaluar expresiones compuestas y propagar valores hacia los nodos padre; "
+            "(2) controlar sentencias condicionales (<code>si</code> / <code>sino</code>) y bucles (<code>enjuego</code>, <code>ronda</code>) ejecutando selectivamente las ramas activas; "
+            "y (3) evaluar subárboles de expresiones fila por fila durante las operaciones de pipeline <code>contratar</code> y <code>descartar</code>.",
             "src/semantic/visitor.py (clase DaZeSemanticVisitor)"
         ),
         (
             "Pregunta 2: ¿Cómo gestiona el DSL el ámbito léxico cuando se invoca una función deportiva (tactica)?",
-            "Verificar si el estudiante comprende el ciclo de vida de los ámbitos (scopes), paso de parámetros y aislamiento de memoria.",
-            "Lo gestionamos mediante una <b>Tabla de Símbolos jerárquica con enlaces estáticos a su ámbito padre</b>. "
-            "Cuando se declara una <code>tactica</code>, el Visitor almacena su definición (nombres de parámetros y el subárbol de sentencias) en la tabla global. "
-            "Al ejecutarse la llamada (<code>visitLlamada_stmt</code>), el intérprete evalúa los argumentos en el ámbito actual y luego <b>crea un nuevo ámbito hijo</b> "
-            "utilizando <code>crear_ambito_hijo()</code>. Dentro de este entorno local se vinculan los parámetros con sus valores. "
-            "Cualquier variable creada dentro de la táctica vive en este ámbito local; al terminar la ejecución (o emitir <code>resultado</code>), el puntero de la tabla de símbolos "
-            "se restaura a su ámbito anterior en un bloque <code>finally</code>, garantizando que las variables locales no contaminen el entorno global.",
+            "Gestión de memoria, ciclos de vida de ámbitos y aislamiento léxico en funciones.",
+            "Lo gestionamos mediante una <b>Tabla de Símbolos jerárquica con punteros a su ámbito padre</b>. "
+            "Cuando se declara una <code>tactica</code>, el Visitor guarda su definición formal en la tabla global. "
+            "Al ejecutarse la llamada (<code>visitLlamada_stmt</code>), el intérprete evalúa los argumentos en el ámbito del llamador y luego "
+            "<b>crea un nuevo ámbito hijo</b> mediante <code>crear_ambito_hijo()</code>. En este entorno local se asocian los parámetros formales con sus valores evaluados. "
+            "Cualquier variable creada dentro de la táctica vive únicamente en ese ámbito local; al concluir la ejecución o emitirse la instrucción <code>resultado expr;</code>, "
+            "el puntero del ámbito activo se restaura a su padre dentro de un bloque <code>finally</code>, garantizando que el entorno global jamás sea contaminado.",
             "src/semantic/tabla_simbolos.py y src/semantic/visitor.py (_ejecutar_tactica)"
         ),
         (
             "Pregunta 3: En un pipeline como 'datos |> descartar(minutos > 0)', ¿cómo sabe el Visitor qué es 'minutos' si no es una variable global?",
-            "Comprobar el mecanismo de enlace dinámico de columnas y contexto de fila.",
+            "Enlace dinámico de identificadores y mecanismo de inyección de contexto de fila.",
             "Implementamos un mecanismo de <b>inyección de contexto de fila</b>. Cuando el Visitor entra a procesar <code>descartar</code> o <code>contratar</code>, "
-            "recorre los registros de la tabla y en cada iteración asigna el diccionario de la fila a <code>self.contexto_fila = fila</code> antes de visitar la expresión. "
-            "En el método <code>visitExprIdentificador</code>, se aplica una resolución en dos niveles: primero se consulta si el identificador coincide con alguna llave de <code>self.contexto_fila</code>. "
-            "Si coincide, retorna el valor del campo para esa fila específica. Si no, busca en la tabla de símbolos global. Si no existe en ninguno de los dos, "
-            "se emite un error semántico indicando que la columna no existe en la plantilla deportiva.",
+            "recorre secuencialmente las filas de la tabla y en cada iteración asigna el diccionario de la fila a <code>self.contexto_fila = fila</code> antes de visitar la expresión. "
+            "En el método <code>visitExprIdentificador</code>, se aplica una resolución en dos niveles: primero verifica si el identificador coincide con alguna llave de <code>self.contexto_fila</code>. "
+            "Si coincide, retorna inmediatamente el valor de esa columna para la fila actual. Si no, busca en la tabla de símbolos del programa. Si tampoco existe, "
+            "se lanza un error semántico indicando que la columna no existe en la plantilla deportiva.",
             "src/semantic/visitor.py (visitExprIdentificador y _aplicar_descartar)"
         ),
         (
-            "Pregunta 4: ¿Por qué decidieron implementar su propia librería (racoons) en lugar de usar pandas y qué estructura de datos eligieron?",
-            "Evaluar comprensión de estructuras de datos internas, algoritmos tabulares y autonomía técnica.",
-            "Decidimos crear <b>racoons</b> desde cero para tener control absoluto sobre el modelo de ejecución y cumplir con la directriz de comprender los algoritmos subyacentes sin depender de cajas negras externas. "
+            "Pregunta 4: ¿Por qué decidieron implementar su propia librería (racoons) en lugar de usar pandas y qué estructura interna eligieron?",
+            "Diseño de estructuras de datos internas, complejidad computacional y autonomía algorítmica.",
+            "Decidimos crear <b>racoons</b> desde cero para tener control absoluto sobre el modelo computacional y cumplir el propósito pedagógico de comprender "
+            "los algoritmos subyacentes sin depender de cajas negras externas. "
             "Internamente, representamos una <code>Tabla</code> con dos atributos: una lista de cadenas para los nombres de columnas y una lista de diccionarios para las filas (<code>List[Dict[str, Any]]</code>). "
-            "Esta estructura híbrida nos ofrece acceso directo por nombre de columna en tiempo $O(1)$ por fila, flexibilidad para inferir tipos de datos dinámicos durante la lectura CSV y una "
+            "Esta estructura híbrida nos ofrece acceso directo por nombre de columna en tiempo $O(1)$ por fila, flexibilidad para inferir tipos de datos durante la lectura CSV y una "
             "complejidad de $O(N)$ para filtros y transformaciones. Para la operación <code>alinear</code>, construimos la clase <code>GrupoTabla</code>, que particiona los registros "
             "en una tabla hash cuyas claves son tuplas con los valores de las columnas de agrupación.",
             "src/core/racoons.py (clases Tabla y GrupoTabla)"
         ),
         (
-            "Pregunta 5: ¿Cómo resolvieron la ambigüedad en la gramática para instrucciones como 'archivar' o 'proyectar'?",
-            "Conocimiento del análisis sintáctico descendente predictivo y el orden de producción de reglas en ANTLR4.",
+            "Pregunta 5: ¿Cómo resolvieron la ambigüedad en la gramática para instrucciones como 'archivar', 'proyectar' o 'pizarra'?",
+            "Comprensión del análisis sintáctico descendente predictivo y resolución de conflictos de prefijo.",
             "En ANTLR4, cuando varias reglas pueden coincidir con el mismo prefijo de tokens, el parser favorece la regla declarada primero en el archivo de gramática. "
-            "Inicialmente, la regla <code>llamada_stmt</code> (que reconoce <code>identificador LPAREN ... RPAREN</code>) estaba antes que <code>guardar_stmt</code> y <code>mostrar_stmt</code>. "
-            "Como palabras como <code>archivar</code> y <code>proyectar</code> también están permitidas como identificadores en ciertos contextos, ANTLR absorbía estas sentencias como llamadas a funciones genéricas. "
-            "La solución consistió en <b>reordenar la regla sentencia en DaZeParser.g4</b>, colocando <code>guardar_stmt</code> y <code>mostrar_stmt</code> antes de <code>llamada_stmt</code>. "
-            "Así, el parser comprueba primero la sintaxis específica del almacenamiento y la proyección antes de recurrir a la llamada genérica.",
+            "Inicialmente, la regla <code>llamada_stmt</code> (que reconoce <code>identificador LPAREN ... RPAREN</code>) estaba antes que <code>guardar_stmt</code>, <code>mostrar_stmt</code> y <code>graficar_stmt</code>. "
+            "Como palabras como <code>archivar</code> o <code>pizarra</code> son léxicamente identificadores, el parser las absorbía erróneamente como llamadas a tácticas genéricas. "
+            "La solución consistió en <b>reordenar la regla sentencia en DaZeParser.g4</b>, ubicando las instrucciones especializadas antes de la llamada a función genérica. "
+            "Así, el parser comprueba primero la sintaxis específica del almacenamiento, proyección y visualización antes de considerar una llamada ordinaria.",
             "grammar/DaZeParser.g4 (regla sentencia)"
         ),
         (
-            "Pregunta 6: ¿Cuál es la diferencia exacta entre un error sintáctico y uno semántico en DaZe? Dé un ejemplo concreto de cada uno en el proyecto.",
-            "Claridad conceptual entre la forma (sintaxis) y el significado/validez de tipos (semántica).",
-            "Un <b>error sintáctico</b> ocurre cuando la secuencia de tokens viola la estructura gramatical del lenguaje. Por ejemplo, en <code>resultado = |&gt; descartar(x &gt; 0)</code>, "
-            "falta la expresión fuente a la izquierda del pipeline; el parser detecta que la regla <code>pipeline_stmt</code> no se cumple y reporta un error sintáctico sin llegar a ejecutar nada.<br/>"
-            "Un <b>error semántico</b> ocurre cuando el código está perfectamente bien escrito gramaticalmente, pero es lógicamente inválido en el contexto de ejecución. "
-            "Por ejemplo, en <code>cantera |&gt; convocar(dorsal, salario)</code>, la gramática es impecable (identificadores separados por comas dentro de convocar), "
-            "pero al ejecutarse en el Visitor, se consulta el esquema de <code>cantera</code> y se descubre que la columna <code>salario</code> no existe en la plantilla juvenil. "
-            "El Visitor detiene la operación y emite un <code>SemanticError</code> detallado.",
-            "src/errors.py, examples/incorrecto_sintaxis.dz y examples/incorrecto_semantico_columna.dz"
+            "Pregunta 6: ¿Cómo genera DaZe un archivo PNG válido en binario puro sin usar Matplotlib, Pillow ni ninguna biblioteca externa?",
+            "Conocimiento de formatos binarios, especificaciones de archivos y manipulación a bajo nivel en Python.",
+            "Se implementó la clase <code>CanvasPNG</code> siguiendo la especificación oficial W3C de PNG. "
+            "Un archivo PNG es una secuencia binaria que inicia con una firma mágica de 8 bytes (<code>\\x89PNG\\r\\n\\x1a\\n</code>), seguida de bloques estructurados llamados <i>chunks</i>. "
+            "Nuestro motor construye: (1) el chunk <code>IHDR</code> con las dimensiones (640x420) y modo de color RGB a 8 bits por canal; "
+            "(2) el chunk <code>IDAT</code>, formateando cada fila con un byte de filtro <code>0x00</code> (None) seguido de los bytes RGB de cada píxel, y comprimiendo todo el flujo con el algoritmo DEFLATE estándar mediante el módulo nativo <code>zlib</code>; "
+            "y (3) el chunk <code>IEND</code> de finalización. Cada chunk incluye su longitud, tipo de 4 letras, datos y un código de redundancia cíclica (CRC32).",
+            "src/core/visualizador.py (clase CanvasPNG y renderizar_pizarra_nativa)"
         ),
         (
-            "Pregunta 7: ¿Qué ocurre si un analista intenta dividir por cero o restar un texto de un número dentro de 'contratar'?",
-            "Manejo de excepciones en tiempo de ejecución, tipado dinámico y robustez del intérprete.",
-            "El Visitor implementa validación de tipos defensiva en los métodos de visita de operadores aritméticos (<code>visitExprMulDivMod</code> y <code>visitExprSumaResta</code>). "
-            "En la división (<code>/</code>), verifica si el operando derecho evaluado es numérico y diferente de cero; si es igual a cero, no permite que Python lance un <i>ZeroDivisionError</i> descontrolado, "
-            "sino que eleva un <code>SemanticError('Division por cero no permitida en calculos de rendimiento')</code> indicando línea y columna. "
-            "En la resta (<code>-</code>), si alguno de los operandos no es entero o flotante, eleva un <code>SemanticError</code> informando los tipos incompatibles recibidos (ej. <code>int</code> y <code>str</code>).",
-            "src/semantic/visitor.py (visitExprMulDivMod y visitExprSumaResta)"
+            "Pregunta 7: ¿Cómo resolvieron que las gráficas PNG tengan títulos, nombres de jugadores y valores numéricos legibles sin librerías gráficas?",
+            "Ingeniería de renderizado visual y rasterización tipográfica nativa.",
+            "Desarrollamos un <b>motor de tipografía de mapa de bits (5x7 ASCII)</b> dentro de <code>visualizador.py</code>. "
+            "Definimos una matriz binaria para los 95 caracteres imprimibles de ASCII. El método <code>texto(x, y, txt, color, escala)</code> recorre cada carácter de la cadena, "
+            "lee su patrón de bits y pinta en la matriz de píxeles los puntos correspondientes, escalando el tamaño según sea necesario. "
+            "Con esto, <code>renderizar_pizarra_nativa</code>: (1) imprime el título centrado en escala 2; (2) traza marcas de graduación en el eje vertical con cuadrícula punteada; "
+            "(3) escribe los nombres de jugadores, categorías o intervalos bajo el eje horizontal; y (4) plasma los valores numéricos exactos sobre cada barra o punto.",
+            "src/core/visualizador.py (FONT_5X7, CanvasPNG.texto y renderizar_pizarra_nativa)"
         ),
         (
-            "Pregunta 8: ¿Cómo funciona el retorno de valor en una 'tactica' utilizando la palabra reservada 'resultado'?",
-            "Comprensión del desenrollado de pila de llamadas (unwinding) en lenguajes interpretados sobre árboles.",
-            "Como el Visitor recorre el AST de manera recursiva, si una instrucción <code>resultado expr;</code> está dentro de un bloque condicional anidado (por ejemplo, dentro de un <code>si</code>), "
-            "un simple <code>return</code> de Python solo saldría de la función visitante local de ese bloque, pero las sentencias posteriores de la táctica se seguirían ejecutando. "
-            "Para resolver esto elegantemente, implementamos la clase <code>ReturnSignal(Exception)</code>. Cuando el Visitor encuentra <code>visitRetornar_stmt</code>, evalúa la expresión "
-            "y lanza esta señal. El método <code>_ejecutar_tactica</code> captura específicamente <code>ReturnSignal</code>, extrae el valor retornado y finaliza la ejecución de la táctica de forma limpia.",
-            "src/semantic/visitor.py (clase ReturnSignal y visitRetornar_stmt)"
+            "Pregunta 8: ¿Cómo se implementaron las estructuras lineales (pila, cola) y los bucles (enjuego, ronda) en la gramática y el Visitor?",
+            "Extensibilidad gramatical y semántica para estructuras de datos y bucles.",
+            "En la gramática (<code>DaZeParser.g4</code>) agregamos reglas dedicadas para declarar <code>pila</code> y <code>cola</code>, y sentencias específicas para sus métodos (<code>apilar</code>, <code>desapilar</code>, <code>encolar</code>, <code>desencolar</code>). "
+            "En el Visitor, se conectaron directamente con las clases <code>Pila</code> y <code>Cola</code> implementadas en <code>src/core/estructuras.py</code>.<br/>"
+            "Para los bucles: en <code>enjuego_stmt</code>, el Visitor evalúa la condición booleana en un bucle <code>while</code> interno de Python y re-visita el bloque de sentencias en cada iteración mientras la condición sea verdadera; "
+            "en <code>ronda_stmt</code>, evalúa la colección iterable (lista o tabla) y en cada paso asigna el elemento actual a la variable de iteración en el ámbito activo antes de ejecutar el bloque.",
+            "grammar/DaZeParser.g4, src/core/estructuras.py y src/semantic/visitor.py"
         ),
         (
-            "Pregunta 9: En la sentencia 'pizarra', ¿por qué el intérprete valida las columnas pero no genera el gráfico PNG?",
-            "Defensa del alcance modular del proyecto según las fases definidas en la guía del curso.",
-            "Porque el proyecto fue estructurado siguiendo la arquitectura modular y las especificaciones de la Sección 5 del documento del curso. "
-            "En el alcance actual, el objetivo es completar la <b>semántica, la tabla de símbolos y el motor de datos tabulares</b>. "
-            "Por ende, en <code>visitGraficar_stmt</code> comprobamos que el dataset referenciado exista y que las columnas configuradas en <code>eje_x</code> y <code>eje_y</code> "
-            "formen parte del esquema real de la tabla. Al validarlo, el sistema garantiza la correctitud semántica de la visualización, dejando la renderización física con librerías gráficas "
-            "para la entrega de visualización final sin mezclar alcances.",
-            "src/semantic/visitor.py (visitGraficar_stmt)"
+            "Pregunta 9: ¿Cómo funcionan los modelos de Machine Learning (Regresión MCO y K-Means) implementados en el lenguaje?",
+            "Comprensión de fundamentos matemáticos de aprendizaje automático en Python puro.",
+            "Se implementaron matemáticamente en <code>src/core/modelos.py</code> y <code>src/core/matematica.py</code>:<br/>"
+            "• <b>Regresión Lineal:</b> Resuelve analíticamente las ecuaciones normales de Mínimos Cuadrados Ordinarios para calcular la pendiente $m$, el intercepto $b$, "
+            "el coeficiente de correlación de Pearson $r$ y la bondad de ajuste $R^2$, permitiendo proyectar valores esperados ($\\hat{y} = mx + b$).<br/>"
+            "• <b>K-Means:</b> Selecciona $K$ centroides iniciales en un espacio bidimensional, asigna iterativamente cada punto al centroide más cercano calculando distancias euclidianas, "
+            "y recalcula las coordenadas de los centroides promediando los puntos de cada cluster hasta alcanzar la convergencia matemática.",
+            "src/core/modelos.py y src/core/matematica.py"
         ),
         (
-            "Pregunta 10: Si mañana quisiéramos agregar una nueva operación de pipeline, por ejemplo 'fusionar' (join entre dos tablas), ¿qué pasos exactos debemos seguir?",
-            "Demostrar visión global de la extensibilidad del compilador/intérprete en todas sus capas.",
-            "Debemos intervenir tres capas de forma ordenada: "
-            "(1) <b>Capa Léxica y Sintáctica:</b> En <code>DaZeLexer.g4</code> agregar el token <code>FUSIONAR: 'fusionar';</code> y en <code>DaZeParser.g4</code> añadir <code>op_fusionar: FUSIONAR LPAREN expr (COMA POR ASIGNAR lista_columnas)? RPAREN;</code> como alternativa de <code>operacion_pipeline</code>, regenerando el parser con ANTLR. "
-            "(2) <b>Capa del Motor de Datos (Core):</b> En <code>src/core/racoons.py</code>, implementar el método <code>fusionar(self, otra_tabla, clave)</code> realizando la combinación de filas según la clave común. "
-            "(3) <b>Capa Semántica (Visitor):</b> En <code>src/semantic/visitor.py</code>, agregar el método <code>_aplicar_fusionar</code>, verificando que la segunda tabla exista en la tabla de símbolos, que la clave pertenezca a ambos esquemas y llamando al método del core.",
-            "grammar/DaZeParser.g4, src/core/racoons.py y src/semantic/visitor.py"
+            "Pregunta 10: ¿Cuál es la diferencia entre un error léxico, sintáctico y semántico en DaZe? Dé un ejemplo concreto de cada uno.",
+            "Diferenciación conceptual clara entre las etapas del front-end y back-end del compilador.",
+            "• <b>Error Léxico:</b> Ocurre cuando un carácter no pertenece al alfabeto del lenguaje. Ej: incluir el símbolo <code>@</code> o <code>$</code> en el código genera un <code>LexerError</code> inmediato.<br/>"
+            "• <b>Error Sintáctico:</b> Ocurre cuando los tokens son válidos pero violan la gramática formal. Ej: escribir <code>resultado = |&gt; descartar(minutos &gt; 0)</code> carece de operando a la izquierda del pipeline; ANTLR detecta que no se cumple <code>pipeline_stmt</code> y aborta.<br/>"
+            "• <b>Error Semántico:</b> Ocurre cuando la estructura es gramaticalmente correcta pero carece de sentido lógico en el dominio. Ej: escribir <code>cantera |&gt; convocar(salario)</code> cuando la columna <code>salario</code> no existe en el esquema tabular, o intentar restar un texto de un entero. El Visitor detecta la incoherencia y lanza un <code>SemanticError</code> detallado.",
+            "src/errors.py, examples/incorrecto_sintaxis.dz e incorrecto_semantico_columna.dz"
+        ),
+        (
+            "Pregunta 11: Si quisiéramos agregar un nuevo tipo de gráfico (por ejemplo, gráfico de pastel 'torta'), ¿cuáles son los pasos exactos en el compilador?",
+            "Visión global de la modularidad y extensibilidad del compilador/intérprete en todas sus capas.",
+            "Se deben seguir cuatro pasos de forma ordenada:<br/>"
+            "1. <b>Front-End:</b> En <code>DaZeLexer.g4</code> agregar el token <code>TORTA: 'torta';</code> y en <code>DaZeParser.g4</code> incluir <code>TORTA</code> en la regla <code>tipo_grafica</code>, regenerando el parser con ANTLR.<br/>"
+            "2. <b>Semántica (Visitor):</b> En <code>visitGraficar_stmt</code> en <code>visitor.py</code>, permitir el tipo <code>torta</code> y validar que la columna de valores numéricos y la de etiquetas pertenezcan al esquema de la tabla.<br/>"
+            "3. <b>Motor de Visualización:</b> En <code>visualizador.py</code>, implementar la función <code>dibujar_torta(canvas, datos, ...)</code> que calcule los ángulos proporcionales de cada categoría y trace los sectores circulares con relleno de color usando trigonometría básica.<br/>"
+            "4. <b>Pruebas de Regresión:</b> Agregar un test unitario en <code>test_visualizacion_ml.py</code> y un ejemplo en <code>examples/</code> para asegurar su funcionamiento continuo.",
+            "grammar/DaZeParser.g4, src/semantic/visitor.py y src/core/visualizador.py"
+        ),
+        (
+            "Pregunta 12: ¿Qué valor aporta el caso de estudio oficial (caso_estudio.dz) y cómo se demuestra la reproducibilidad del DSL?",
+            "Demostración del dominio de aplicación, valor práctico y cumplimiento de requisitos del curso.",
+            "El caso de estudio demuestra un flujo reproducible de ciencia de datos deportiva de extremo a extremo: "
+            "(1) carga 15 futbolistas profesionales; (2) transforma variables y calcula métricas clave de impacto y desgaste; "
+            "(3) realiza agrupación y balance estadístico exportando a CSV; (4) modela regresión lineal para predecir goles esperados y segmenta a la plantilla en 3 perfiles tácticos con K-Means; "
+            "y (5) exporta 4 pizarras visuales PNG con títulos, marcas de graduación y etiquetas numéricas legibles.<br/>"
+            "La <b>reproducibilidad</b> se demuestra porque cualquier analista puede ejecutar <code>./daze caso_estudio.dz</code> desde la terminal y regenerar exactamente las mismas tablas, cálculos y gráficos en menos de un segundo sin tocar ni una sola línea del código Python subyacente.",
+            "caso_estudio.dz, salidas/ y README.md"
         )
     ]
 
@@ -521,24 +696,28 @@ def crear_guia_estudio_pdf(ruta_salida: str):
             [Paragraph(f"<b>Respuesta recomendada para la sustentación:</b><br/>{ideal_ans}", body_style)],
             [Paragraph(f"<b>Ubicación en el código para mostrar:</b> <code>{code_ref}</code>", code_style)]
         ]
-        t_q = Table(q_card, colWidths=[512])
+        t_q = Table(q_card, colWidths=[522])
         t_q.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#F7FAFC")),
             ('BOX', (0,0), (-1,-1), 1, c_border),
             ('LINELEFT', (0,0), (0,-1), 3.5, c_secondary if i % 2 == 1 else c_accent),
-            ('TOPPADDING', (0,0), (-1,-1), 4),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-            ('LEFTPADDING', (0,0), (-1,-1), 8),
-            ('RIGHTPADDING', (0,0), (-1,-1), 8),
+            ('TOPPADDING', (0,0), (-1,-1), 3.5),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
+            ('LEFTPADDING', (0,0), (-1,-1), 7),
+            ('RIGHTPADDING', (0,0), (-1,-1), 7),
         ]))
-        story.append(KeepTogether([t_q, Spacer(1, 6)]))
+        story.append(KeepTogether([t_q, Spacer(1, 5)]))
 
+    # Construir documento
     doc.build(story, canvasmaker=NumberedCanvas)
     print(f"Guía de estudio generada exitosamente en: {ruta_salida}")
 
 
 if __name__ == "__main__":
-    salida = "/home/shibakude-_-/Downloads/Proyecto_lenguajes/Guia_de_Estudio_Sustentacion_DaZe.pdf"
+    salida = "/home/shibakude-_-/Downloads/lenguajes/proyecto_lenguajes/docs/Guia_de_Estudio_Sustentacion_DaZe.pdf"
     if len(sys.argv) > 1:
         salida = sys.argv[1]
+    
+    # Crear directorio si no existe
+    os.makedirs(os.path.dirname(os.path.abspath(salida)), exist_ok=True)
     crear_guia_estudio_pdf(salida)
