@@ -184,7 +184,7 @@ Tener instalado Python 3.11 o superior. El proyecto solo requiere el paquete ofi
 git clone https://github.com/27saya/proyecto_lenguajes.git
 cd proyecto_lenguajes
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate (activate.fish si se usa fish)
 pip install -r requirements.txt
 chmod +x daze
 ```
