@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PYTHONPATH="$DIR:$PYTHONPATH"
+
+if [ -f "$DIR/.venv/bin/python" ]; then
+    PY="$DIR/.venv/bin/python"
+elif [ -f "$DIR/venv/bin/python" ]; then
+    PY="$DIR/venv/bin/python"
+else
+    PY="python3"
+fi
+
+exec "$PY" "$DIR/src/cli.py" "$@"

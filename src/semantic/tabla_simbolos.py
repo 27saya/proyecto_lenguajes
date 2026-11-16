@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional, List
 from src.core.racoons import Tabla
+from src.core.estructuras import Pila, Cola
 
 
 class Simbolo:
@@ -36,6 +37,12 @@ class Simbolo:
             self.tipo = "BOOLEANO"
         elif isinstance(nuevo_valor, list):
             self.tipo = "LISTA"
+        elif isinstance(nuevo_valor, dict):
+            self.tipo = "DICCIONARIO"
+        elif isinstance(nuevo_valor, Pila):
+            self.tipo = "PILA"
+        elif isinstance(nuevo_valor, Cola):
+            self.tipo = "COLA"
 
     def __repr__(self) -> str:
         esquema_info = f", cols={self.esquema}" if self.esquema else ""

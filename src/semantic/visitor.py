@@ -6,6 +6,10 @@ from antlr4 import ParserRuleContext
 from src.generated.DaZeParser import DaZeParser
 from src.generated.DaZeParserVisitor import DaZeParserVisitor
 from src.core.racoons import Tabla, GrupoTabla
+from src.core.visualizador import renderizar_pizarra_nativa
+from src.core.ml import correlacion_pearson, RegresionLineal, KMeans
+from src.core.estructuras import Pila, Cola
+import src.core.matematica as mate
 from src.semantic.tabla_simbolos import TablaSimbolos, Simbolo
 from src.errors import SemanticError, DiagnosticError
 
@@ -40,6 +44,35 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
         self.base_dir = base_dir or os.getcwd()
         self.contexto_fila: Optional[Dict[str, Any]] = None
         self.errores_semanticos: List[DiagnosticError] = []
+        self._registrar_funciones_nativas()
+
+    def _registrar_funciones_nativas(self):
+        nativas = {
+            "raiz": mate.raiz_cuadrada,
+            "sqrt": mate.raiz_cuadrada,
+            "seno": mate.seno,
+            "coseno": mate.coseno,
+            "tangente": mate.tangente,
+            "abs": mate.valor_absoluto,
+            "potencia": mate.potencia,
+            "maximo": mate.maximo_coleccion,
+            "minimo": mate.minimo_coleccion,
+            "promedio": mate.promedio_coleccion,
+            "pila": lambda: Pila(),
+            "cola": lambda: Cola(),
+            "apilar": lambda p, x: p.apilar(x) if isinstance(p, Pila) else self._err_tipo("Pila", p),
+            "desapilar": lambda p: p.desapilar() if isinstance(p, Pila) else self._err_tipo("Pila", p),
+            "tope": lambda p: p.tope() if isinstance(p, Pila) else self._err_tipo("Pila", p),
+            "encolar": lambda c, x: c.encolar(x) if isinstance(c, Cola) else self._err_tipo("Cola", c),
+            "desencolar": lambda c: c.desencolar() if isinstance(c, Cola) else self._err_tipo("Cola", c),
+            "frente": lambda c: c.frente() if isinstance(c, Cola) else self._err_tipo("Cola", c),
+            "longitud": lambda col: len(col),
+        }
+        for nombre, func in nativas.items():
+            self.tabla_simbolos.definir(nombre, func, tipo="TACTICA")
+
+    def _err_tipo(self, esperado: str, recibido: Any):
+        raise TypeError(f"Se esperaba una estructura '{esperado}', pero se recibio '{type(recibido).__name__}'.")
 
     def _resolver_ruta(self, ruta: str) -> str:
         if os.path.isabs(ruta):
@@ -463,7 +496,7 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
 
     def visitGraficar_stmt(self, ctx: DaZeParser.Graficar_stmtContext):
         # Validacion semantica de la declaracion de visualizacion
-        tipo = ctx.tipo_grafico().getText()
+        tipo = ctx.tipo_grafico().getText().lower()
         valor_tabla = self.visit(ctx.expr())
         if isinstance(valor_tabla, GrupoTabla):
             valor_tabla = valor_tabla.tabla_origen
@@ -473,32 +506,38 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
 
         # Validar propiedades configuradas dentro del bloque
         configs: Dict[str, Any] = {}
-        for c_ctx in ctx.configuracion_grafico():
-            clave = c_ctx.identificador().getText()
-            expr_c = c_ctx.expr()
-            if isinstance(expr_c, DaZeParser.ExprIdentificadorContext):
-                val_txt = expr_c.identificador().getText()
-                if val_txt in valor_tabla.columnas:
-                    val = val_txt
+        if hasattr(ctx, "configuracion_grafico") and ctx.configuracion_grafico():
+            for c_ctx in ctx.configuracion_grafico():
+                clave = c_ctx.identificador().getText()
+                expr_c = c_ctx.expr()
+                if isinstance(expr_c, DaZeParser.ExprIdentificadorContext):
+                    val_txt = expr_c.identificador().getText()
+                    if val_txt in valor_tabla.columnas:
+                        val = val_txt
+                    else:
+                        simbolo = self.tabla_simbolos.obtener(val_txt)
+                        val = simbolo.valor if simbolo else val_txt
                 else:
-                    simbolo = self.tabla_simbolos.obtener(val_txt)
-                    val = simbolo.valor if simbolo else val_txt
-            else:
-                val = self.visit(expr_c)
-            configs[clave] = val
+                    try:
+                        val = self.visit(expr_c)
+                    except Exception:
+                        val = expr_c.getText()
+                if val is None:
+                    val = expr_c.getText()
+                configs[clave] = str(val) if isinstance(val, str) else val
 
         for eje in ("eje_x", "eje_y", "x", "y"):
             if eje in configs:
-                col_name = str(configs[eje])
+                col_name = str(configs[eje]).strip("'\"")
                 if col_name not in valor_tabla.columnas:
-                    # Advertencia / comprobacion semantica
                     raise self._error(
                         f"En la pizarra '{tipo}', la columna '{col_name}' especificada en '{eje}' no existe en la plantilla.",
                         ctx,
                         col_name,
                     )
 
-        print(f"[Pizarra] Especificacion validada para grafico '{tipo}' ({len(valor_tabla)} registros disponibles)")
+        # Renderizar pizarra dual (consola ASCII + empaquetado binario PNG)
+        renderizar_pizarra_nativa(tipo, valor_tabla.filas, configs)
         return configs
 
     # -------------------------------------------------------------
@@ -793,6 +832,66 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
 
     def visitExprLlamada(self, ctx: DaZeParser.ExprLlamadaContext):
         nombre = ctx.identificador().getText()
+
+        # Despacho de algoritmos de Machine Learning puros
+        if nombre in (
+            "correlacion", "correlacion_pearson",
+            "regresion_lineal", "regresionlineal",
+            "predecir_regresion", "predecir",
+            "agrupar_kmedias", "agruparkmedias", "kmedias"
+        ):
+            _ml_args = []
+            if hasattr(ctx, "lista_argumentos") and ctx.lista_argumentos():
+                for _a in ctx.lista_argumentos().argumento():
+                    _expr = _a.expr() if hasattr(_a, "expr") and _a.expr() else _a
+                    _ml_args.append(self.visit(_expr))
+
+            if nombre in ("correlacion", "correlacion_pearson"):
+                if len(_ml_args) != 2:
+                    raise Exception("correlacion() requiere 2 listas: correlacion(x, y)")
+                return correlacion_pearson(_ml_args[0], _ml_args[1])
+
+            if nombre in ("regresion_lineal", "regresionlineal"):
+                if len(_ml_args) != 2:
+                    raise Exception("regresion_lineal() requiere 2 listas: regresion_lineal(x, y)")
+                modelo = RegresionLineal().ajustar(_ml_args[0], _ml_args[1])
+                return {
+                    "m": modelo.m,
+                    "b": modelo.b,
+                    "r2": modelo.r2,
+                    "_modelo": modelo,
+                    "modelo": modelo
+                }
+
+            if nombre in ("predecir_regresion", "predecir"):
+                if len(_ml_args) != 2:
+                    raise Exception("predecir() requiere el modelo y el valor: predecir(mod, x)")
+                mod = _ml_args[0]
+                val = _ml_args[1]
+                if isinstance(mod, dict) and "_modelo" in mod:
+                    return mod["_modelo"].predecir(val)
+                if isinstance(mod, dict) and "modelo" in mod:
+                    return mod["modelo"].predecir(val)
+                if isinstance(mod, dict) and "m" in mod and "b" in mod:
+                    if isinstance(val, list):
+                        return [round(mod["m"] * v + mod["b"], 4) for v in val]
+                    return round(mod["m"] * val + mod["b"], 4)
+                if hasattr(mod, "predecir"):
+                    return mod.predecir(val)
+                raise Exception("El primer argumento debe ser un modelo entrenado de regresion.")
+
+            if nombre in ("agrupar_kmedias", "agruparkmedias", "kmedias"):
+                if len(_ml_args) < 2:
+                    raise Exception("agrupar_kmedias() requiere datos y valor k: agrupar_kmedias(datos, k)")
+                datos = _ml_args[0]
+                k = int(_ml_args[1])
+                km = KMeans(k=k, max_iter=60).ajustar(datos)
+                return {
+                    "centroides": km.centroides,
+                    "etiquetas": km.etiquetas,
+                    "modelo": km
+                }
+
         simbolo = self.tabla_simbolos.obtener(nombre)
         if not simbolo:
             raise self._error(f"Tactica o funcion '{nombre}' no declarada.", ctx, nombre)
@@ -808,6 +907,91 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
             return simbolo.valor(*args_evaluados)
         else:
             raise self._error(f"'{nombre}' no es ejecutable como funcion.", ctx, nombre)
+
+    # -------------------------------------------------------------
+    # Metodos para Ciclos, Arreglos y Diccionarios
+    # -------------------------------------------------------------
+
+    def visitAsignacion_indexada(self, ctx: DaZeParser.Asignacion_indexadaContext):
+        id_nombre = ctx.identificador().getText()
+        simbolo = self.tabla_simbolos.obtener(id_nombre)
+        if not simbolo:
+            raise self._error(f"Variable '{id_nombre}' no declarada.", ctx, id_nombre)
+
+        contenedor = simbolo.valor
+        indice = self.visit(ctx.expr(0))
+        nuevo_valor = self.visit(ctx.expr(1))
+
+        if isinstance(contenedor, list):
+            if not isinstance(indice, int):
+                raise self._error(f"El indice debe ser entero, recibido '{type(indice).__name__}'.", ctx)
+            if indice < 0 or indice >= len(contenedor):
+                raise self._error(f"Indice {indice} fuera de rango para lista de tamano {len(contenedor)}.", ctx)
+            contenedor[indice] = nuevo_valor
+        elif isinstance(contenedor, dict):
+            contenedor[indice] = nuevo_valor
+        else:
+            raise self._error(f"El tipo '{type(contenedor).__name__}' no admite asignacion por indice.", ctx)
+        return nuevo_valor
+
+    def visitBucle_mientras_stmt(self, ctx: DaZeParser.Bucle_mientras_stmtContext):
+        resultado = None
+        while bool(self.visit(ctx.expr())):
+            for s in ctx.sentencia():
+                resultado = self.visit(s)
+        return resultado
+
+    def visitBucle_para_stmt(self, ctx: DaZeParser.Bucle_para_stmtContext):
+        var_iterador = ctx.identificador().getText()
+        coleccion = self.visit(ctx.expr())
+
+        if isinstance(coleccion, (Tabla, GrupoTabla)):
+            iterable = coleccion.filas if isinstance(coleccion, Tabla) else coleccion.tabla_origen.filas
+        elif isinstance(coleccion, (list, tuple)):
+            iterable = coleccion
+        elif isinstance(coleccion, dict):
+            iterable = list(coleccion.keys())
+        else:
+            raise self._error(f"No se puede iterar en 'ronda' sobre tipo '{type(coleccion).__name__}'.", ctx.expr())
+
+        resultado = None
+        for elemento in iterable:
+            if self.tabla_simbolos.existe(var_iterador):
+                self.tabla_simbolos.actualizar(var_iterador, elemento)
+            else:
+                self.tabla_simbolos.definir(var_iterador, elemento)
+
+            for s in ctx.sentencia():
+                resultado = self.visit(s)
+        return resultado
+
+    def visitExprDiccionario(self, ctx: DaZeParser.ExprDiccionarioContext):
+        d = {}
+        if ctx.lista_diccionario():
+            for p in ctx.lista_diccionario().par_diccionario():
+                clave_raw = p.getChild(0).getText()
+                if (clave_raw.startswith('"') and clave_raw.endswith('"')) or (clave_raw.startswith("'") and clave_raw.endswith("'")):
+                    clave = clave_raw[1:-1]
+                else:
+                    clave = clave_raw
+                d[clave] = self.visit(p.expr())
+        return d
+
+    def visitExprIndexacion(self, ctx: DaZeParser.ExprIndexacionContext):
+        contenedor = self.visit(ctx.expr(0))
+        indice = self.visit(ctx.expr(1))
+
+        if isinstance(contenedor, list):
+            if not isinstance(indice, int):
+                raise self._error(f"El indice debe ser entero, recibido '{type(indice).__name__}'.", ctx)
+            if indice < 0 or indice >= len(contenedor):
+                raise self._error(f"Indice {indice} fuera de rango para lista de longitud {len(contenedor)}.", ctx)
+            return contenedor[indice]
+        elif isinstance(contenedor, dict):
+            if indice not in contenedor:
+                raise self._error(f"Clave '{indice}' no existe en el diccionario.", ctx)
+            return contenedor[indice]
+        raise self._error(f"El tipo '{type(contenedor).__name__}' no admite acceso por corchetes.", ctx)
 
 
 def ejecutar_codigo(codigo: str, base_dir: Optional[str] = None):

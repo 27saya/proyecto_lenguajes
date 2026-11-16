@@ -1,0 +1,10 @@
+plantilla = fichar("datos/rendimiento_jugadores.csv");
+ofensiva = plantilla
+|> convocar(nombre, club,  posicion, minutos, goles,  asistencias)
+|> descartar(minutos>900)
+|> contratar(
+        aporte_gol = goles + asistencias,
+        minutos_por_gol = minutos / (goles + 1)
+    );
+
+proyectar(ofensiva);
