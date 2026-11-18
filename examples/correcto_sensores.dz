@@ -1,4 +1,5 @@
 # Monitoreo biometrico de chalecos GPS durante el entrenamiento
+t_inicio = cronometro();
 
 # 1. Carga de telemetria de sensores de entrenamiento
 telemetria = fichar("datos/gps_rendimiento.csv", separador=";");
@@ -39,3 +40,14 @@ pizarra dispersion(gpsfiltrado) {
     titulo = "Correlacion ritmo cardiaco vs desgaste";
     guardar = "salidas/monitoreogps.png";
 }
+
+# Metricas de rendimiento
+tiempo_ejecucion = cronometro() - t_inicio;
+memoria_usada = memoria();
+
+proyectar("");
+proyectar("--- Metricas de rendimiento ---");
+proyectar("Tiempo de ejecucion (s):");
+proyectar(tiempo_ejecucion);
+proyectar("Memoria pico usada (KB):");
+proyectar(memoria_usada);

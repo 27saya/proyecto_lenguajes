@@ -2,6 +2,8 @@
 # Programa 5: Filtro funcional para datos que sean de tipo primo
 # ==================================================================
 
+t_inicio = cronometro();
+
 proyectar("==================================================");
 proyectar("   Programa 5: Filtro funcional para datos primos ");
 proyectar("==================================================");
@@ -75,3 +77,14 @@ pizarra dispersion(datos_primos) {
 proyectar("Archivo CSV archivado en 'salidas/datos_primos.csv'.");
 proyectar("Pizarra exportada a 'salidas/grafica_primos.png'.");
 proyectar("Programa 5 completado con exito.");
+
+# Metricas de ejecucion y uso de memoria
+t_fin = cronometro();
+tiempo_ejecucion = t_fin - t_inicio;
+memoria_usada = memoria();
+
+proyectar("\n--------------------------------------------------");
+proyectar("Metricas de ejecucion del programa:");
+proyectar("Tiempo de ejecucion: " + cadena(tiempo_ejecucion) + " segundos");
+proyectar("Memoria utilizada:   " + cadena(memoria_usada) + " KB");
+proyectar("--------------------------------------------------");

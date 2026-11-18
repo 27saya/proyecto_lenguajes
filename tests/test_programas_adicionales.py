@@ -93,6 +93,31 @@ class TestProgramasAdicionales(unittest.TestCase):
             ruta = os.path.join(dir_prog, archivos[0])
             visitor, errores = ejecutar_archivo(ruta)
             self.assertEqual(len(errores), 0, f"Error ejecutando {archivos[0]}: {errores}")
+            # Validar que se registraron tiempo_ejecucion y memoria_usada
+            simbolo_t = visitor.tabla_simbolos.obtener("tiempo_ejecucion")
+            simbolo_m = visitor.tabla_simbolos.obtener("memoria_usada")
+            self.assertIsNotNone(simbolo_t, f"Debe existir 'tiempo_ejecucion' en {archivos[0]}")
+            self.assertIsNotNone(simbolo_m, f"Debe existir 'memoria_usada' en {archivos[0]}")
+            self.assertGreaterEqual(simbolo_t.valor, 0.0)
+            self.assertGreater(simbolo_m.valor, 0.0)
+
+    def test_metricas_tiempo_y_memoria(self):
+        codigo = """
+        t0 = cronometro();
+        m0 = memoria();
+        lista = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        t1 = cronometro();
+        tiempo_ejecucion = t1 - t0;
+        memoria_usada = memoria();
+        """
+        visitor, errores = ejecutar_codigo(codigo)
+        self.assertEqual(len(errores), 0, f"Errores al medir metricas: {errores}")
+        t = visitor.tabla_simbolos.obtener("tiempo_ejecucion").valor
+        m = visitor.tabla_simbolos.obtener("memoria_usada").valor
+        self.assertIsInstance(t, float)
+        self.assertGreaterEqual(t, 0.0)
+        self.assertIsInstance(m, float)
+        self.assertGreater(m, 0.0)
 
 
 if __name__ == "__main__":

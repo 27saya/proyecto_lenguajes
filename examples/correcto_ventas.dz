@@ -1,4 +1,5 @@
 # Flujo de analisis de rendimiento deportivo en DaZe
+t_inicio = cronometro();
 
 # 1. Carga del conjunto de datos de plantilla
 jugadores = fichar("datos/plantilla_temporada.csv", separador=",", encabezado=verdadero);
@@ -49,3 +50,14 @@ pizarra dispersion(jugadoresaptos) {
     color = "crimson";
     guardar = "salidas/dispersionrendimiento.png";
 }
+
+# Metricas de rendimiento
+tiempo_ejecucion = cronometro() - t_inicio;
+memoria_usada = memoria();
+
+proyectar("");
+proyectar("--- Metricas de rendimiento ---");
+proyectar("Tiempo de ejecucion (s):");
+proyectar(tiempo_ejecucion);
+proyectar("Memoria pico usada (KB):");
+proyectar(memoria_usada);

@@ -2,6 +2,8 @@
 # Programa 2: Calculo y visualizacion de la funcion Sigmoide
 # ==================================================================
 
+t_inicio = cronometro();
+
 proyectar("==================================================");
 proyectar("   Programa 2: Visualizacion de la funcion Sigmoide");
 proyectar("==================================================");
@@ -43,3 +45,14 @@ pizarra lineas(tabla_sigmoide) {
 
 proyectar("Pizarra de la funcion sigmoide exportada a 'salidas/grafica_sigmoide.png'.");
 proyectar("Programa 2 completado con exito.");
+
+# Metricas de ejecucion y uso de memoria
+t_fin = cronometro();
+tiempo_ejecucion = t_fin - t_inicio;
+memoria_usada = memoria();
+
+proyectar("\n--------------------------------------------------");
+proyectar("Metricas de ejecucion del programa:");
+proyectar("Tiempo de ejecucion: " + cadena(tiempo_ejecucion) + " segundos");
+proyectar("Memoria utilizada:   " + cadena(memoria_usada) + " KB");
+proyectar("--------------------------------------------------");

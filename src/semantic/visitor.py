@@ -1,5 +1,11 @@
 import os
 import sys
+import time
+import tracemalloc
+try:
+    import resource
+except ImportError:
+    resource = None
 from typing import Any, Dict, List, Optional, Union
 from antlr4 import ParserRuleContext
 
@@ -30,6 +36,36 @@ class TacticaDefinicion:
 
     def __repr__(self):
         return f"<Tactica {self.nombre}({', '.join(self.parametros)})>"
+
+
+# Iniciar rastreo de memoria de forma segura si no esta activo
+if not tracemalloc.is_tracing():
+    tracemalloc.start()
+
+
+def _obtener_tiempo_actual() -> float:
+    return round(time.perf_counter(), 6)
+
+
+def _obtener_memoria_actual_kb() -> float:
+    if tracemalloc.is_tracing():
+        curr, peak = tracemalloc.get_traced_memory()
+        if peak > 0:
+            return round(peak / 1024.0, 2)
+    if resource is not None:
+        try:
+            rusage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            if rusage > 0:
+                return round(float(rusage), 2)
+        except Exception:
+            pass
+    return 0.0
+
+
+def _iniciar_medicion() -> float:
+    if tracemalloc.is_tracing():
+        tracemalloc.reset_peak()
+    return _obtener_tiempo_actual()
 
 
 def _leer_consola(prompt=""):
@@ -90,6 +126,13 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
             "mlp_xor": lambda epocas=6000, lr=0.8: entrenar_mlp_xor(epocas=epocas, lr=lr),
             "entrenar_mlp_xor": lambda epocas=6000, lr=0.8: entrenar_mlp_xor(epocas=epocas, lr=lr),
             "predecir_mlp": lambda mod, x: predecir_mlp(mod, x),
+            "cronometro": lambda: _obtener_tiempo_actual(),
+            "tiempo": lambda: _obtener_tiempo_actual(),
+            "tiempo_actual": lambda: _obtener_tiempo_actual(),
+            "memoria": lambda: _obtener_memoria_actual_kb(),
+            "memoria_actual": lambda: _obtener_memoria_actual_kb(),
+            "iniciar_medicion": lambda: _iniciar_medicion(),
+            "iniciar_cronometro": lambda: _iniciar_medicion(),
         }
         for nombre, func in nativas.items():
             self.tabla_simbolos.definir(nombre, func, tipo="TACTICA")

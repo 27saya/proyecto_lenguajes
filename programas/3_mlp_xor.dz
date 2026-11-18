@@ -2,6 +2,8 @@
 # Programa 3: Perceptron Multicapa para XOR (Graficas y Estimador)
 # ==================================================================
 
+t_inicio = cronometro();
+
 proyectar("==================================================");
 proyectar("   Programa 3: Perceptron Multicapa para XOR     ");
 proyectar("==================================================");
@@ -55,3 +57,14 @@ pizarra lineas(tabla_perdida) {
 
 proyectar("Grafica de convergencia exportada a 'salidas/mlp_xor_perdida.png'.");
 proyectar("Programa 3 completado con exito.");
+
+# Metricas de ejecucion y uso de memoria
+t_fin = cronometro();
+tiempo_ejecucion = t_fin - t_inicio;
+memoria_usada = memoria();
+
+proyectar("\n--------------------------------------------------");
+proyectar("Metricas de ejecucion del programa:");
+proyectar("Tiempo de ejecucion: " + cadena(tiempo_ejecucion) + " segundos");
+proyectar("Memoria utilizada:   " + cadena(memoria_usada) + " KB");
+proyectar("--------------------------------------------------");

@@ -2,6 +2,8 @@
 # Programa 4: Analisis Exploratorio de Datos (EDA) sobre data.xlsx
 # ==================================================================
 
+t_inicio = cronometro();
+
 proyectar("==================================================");
 proyectar("   Programa 4: Analisis Exploratorio (data.xlsx) ");
 proyectar("==================================================");
@@ -77,3 +79,14 @@ pizarra barras(resumen_educacion) {
 
 proyectar("Pizarras exportadas a 'salidas/eda_ingreso_por_sexo.png' y 'salidas/eda_ingreso_por_educacion.png'.");
 proyectar("Programa 4 completado con exito.");
+
+# Metricas de ejecucion y uso de memoria
+t_fin = cronometro();
+tiempo_ejecucion = t_fin - t_inicio;
+memoria_usada = memoria();
+
+proyectar("\n--------------------------------------------------");
+proyectar("Metricas de ejecucion del programa:");
+proyectar("Tiempo de ejecucion: " + cadena(tiempo_ejecucion) + " segundos");
+proyectar("Memoria utilizada:   " + cadena(memoria_usada) + " KB");
+proyectar("--------------------------------------------------");

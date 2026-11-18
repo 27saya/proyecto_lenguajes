@@ -1,6 +1,7 @@
 proyectar("==================================================================");
 proyectar("   Caso de estudio oficial: sports analytics DSL (DaZe .dz)       ");
 proyectar("==================================================================");
+t_inicio = cronometro();
 
 # 1. Carga inicial de la plantilla profesional
 proyectar("");
@@ -125,3 +126,14 @@ proyectar("");
 proyectar("==================================================================");
 proyectar("Caso de estudio completado y archivado exitosamente.");
 proyectar("==================================================================");
+
+# Registro de telemetria y metricas de rendimiento
+tiempo_ejecucion = cronometro() - t_inicio;
+memoria_usada = memoria();
+
+proyectar("");
+proyectar("--- Metricas de rendimiento ---");
+proyectar("Tiempo de ejecucion (s):");
+proyectar(tiempo_ejecucion);
+proyectar("Memoria pico usada (KB):");
+proyectar(memoria_usada);
