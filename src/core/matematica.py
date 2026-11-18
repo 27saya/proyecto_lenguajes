@@ -108,3 +108,57 @@ def promedio_coleccion(lista):
     for x in lista:
         suma += x
     return round(suma / len(lista), 4)
+
+
+E_CONST = 2.718281828459045
+
+
+def exp(x, terminos=40):
+    """Calculo de funcion exponencial e^x mediante series de Taylor y reduccion de rango."""
+    if x == 0:
+        return 1.0
+    if x < -50:
+        return 0.0
+    if x > 50:
+        x = 50.0
+
+    k = int(x)
+    resto = x - k
+    res = 1.0
+    term = 1.0
+    for i in range(1, terminos):
+        term *= resto / i
+        res += term
+        if valor_absoluto(term) < 1e-16:
+            break
+
+    potencia_entera = (E_CONST ** k) if k >= 0 else (1.0 / (E_CONST ** (-k)))
+    return potencia_entera * res
+
+
+def sigmoide(x):
+    """Calculo de funcion logistica sigmoide: 1 / (1 + e^-x)."""
+    return round(1.0 / (1.0 + exp(-x)), 6)
+
+
+def es_primo(n):
+    """Verifica si un numero entero es primo mediante prueba 6k +- 1."""
+    try:
+        n = int(n)
+    except (ValueError, TypeError):
+        return False
+
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+

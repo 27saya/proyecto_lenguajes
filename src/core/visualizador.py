@@ -415,16 +415,20 @@ def renderizar_pizarra_nativa(tipo, filas, config):
     elif tipo in ("lineas", "caja"):
         etiquetas = [str(f.get(eje_x, f"P{i+1}")) for i, f in enumerate(filas)]
         valores = [float(f.get(eje_y, 0)) for f in filas]
-        max_v = max(valores) if valores and max(valores) > 0 else 1.0
+        min_v = min(valores) if valores else 0.0
+        max_v = max(valores) if valores else 1.0
+        base_v = 0.0 if min_v >= 0.0 else min_v
+        rango_v = (max_v - base_v) if max_v != base_v else 1.0
 
         for etq, val in zip(etiquetas, valores):
-            punto = "─" * int((val / max_v) * 25) + "●"
+            long_p = max(0, int(((val - base_v) / rango_v) * 25))
+            punto = "─" * long_p + "●"
             print(f"  {etq:>14} │ {punto} {val}")
 
         # Marcas y valores de referencia en el eje Y
         for frac in [0.0, 0.25, 0.5, 0.75, 1.0]:
             y_tick = int(y_base - (frac * (y_base - y_top - 20)))
-            val_tick = _formatear_numero(frac * max_v)
+            val_tick = _formatear_numero(base_v + frac * rango_v)
             canvas.linea(x_orig - 4, y_tick, x_orig, y_tick, (70, 70, 70))
             if frac > 0:
                 canvas.linea_punteada(x_orig + 1, y_tick, x_fin, y_tick, (230, 230, 235))
@@ -437,7 +441,7 @@ def renderizar_pizarra_nativa(tipo, filas, config):
 
         for i, (etq, val) in enumerate(zip(etiquetas, valores)):
             px = x_orig + 20 + i * paso
-            py = int(y_base - (val / max_v) * (y_base - y_top - 20))
+            py = int(y_base - ((val - base_v) / rango_v) * (y_base - y_top - 20))
             puntos.append((px, py))
 
             # Circulo del dato

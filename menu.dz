@@ -1,0 +1,289 @@
+# ==================================================================
+# DaZe DSL - Menu interactivo principal de programas
+# ==================================================================
+
+# ------------------------------------------------------------------
+# Programa 1: Calculo de factorial (# 5 al 100)
+# ------------------------------------------------------------------
+tactica ejecutar_programa_1() {
+    proyectar("\n==================================================");
+    proyectar("   Programa 1: Funcion factorial (# 5 a 100)      ");
+    proyectar("==================================================");
+
+    tactica fact_func(n) {
+        si (n <= 1) {
+            resultado 1;
+        }
+        res = 1;
+        idx = 2;
+        enjuego (idx <= n) {
+            res = res * idx;
+            idx = idx + 1;
+        }
+        resultado res;
+    }
+
+    proyectar("\nCalculando muestra de factoriales clave en el rango [5, 100]:");
+    claves = [5, 6, 7, 10, 15, 20, 25, 50, 75, 100];
+    ronda (num en claves) {
+        val = fact_func(num);
+        proyectar("Factorial de " + cadena(num) + ": " + cadena(val));
+    }
+
+    # Generar tabla demostrativa 5 al 15
+    filas = [];
+    k = 5;
+    enjuego (k <= 15) {
+        apilar(filas, {"numero": k, "factorial": fact_func(k)});
+        k = k + 1;
+    }
+    tabla_fact = crear_tabla(filas);
+    proyectar("\nTabla de factoriales inmediatos (5 al 15):");
+    proyectar(tabla_fact);
+
+    proyectar("Programa 1 completado con exito.\n");
+}
+
+# ------------------------------------------------------------------
+# Programa 2: Visualizacion de la funcion Sigmoide
+# ------------------------------------------------------------------
+tactica ejecutar_programa_2() {
+    proyectar("\n==================================================");
+    proyectar("   Programa 2: Visualizacion de la funcion Sigmoide");
+    proyectar("==================================================");
+
+    tactica calc_sigm(x) {
+        resultado 1.0 / (1.0 + exp(-x));
+    }
+
+    proyectar("Generando puntos de la curva sigmoide en x en [-6.0, 6.0]:");
+    filas_sigm = [];
+    x_val = -6.0;
+    enjuego (x_val <= 6.0) {
+        s_val = calc_sigm(x_val);
+        apilar(filas_sigm, {
+            "x": x_val,
+            "sigmoide": s_val,
+            "etiqueta": "x=" + cadena(x_val)
+        });
+        x_val = x_val + 1.0;
+    }
+
+    tabla_sigm = crear_tabla(filas_sigm);
+    proyectar(tabla_sigm);
+
+    proyectar("Renderizando pizarra visual...");
+    pizarra lineas(tabla_sigm) {
+        eje_x = "etiqueta";
+        eje_y = "sigmoide";
+        titulo = "Curva Sigmoide 1 / (1 + e^-x)";
+        color = "azul";
+        guardar = "salidas/grafica_sigmoide.png";
+    }
+
+    proyectar("Pizarra exportada a 'salidas/grafica_sigmoide.png'.");
+    proyectar("Programa 2 completado con exito.\n");
+}
+
+# ------------------------------------------------------------------
+# Programa 3: Perceptron Multicapa para XOR
+# ------------------------------------------------------------------
+tactica ejecutar_programa_3() {
+    proyectar("\n==================================================");
+    proyectar("   Programa 3: Perceptron Multicapa para XOR     ");
+    proyectar("==================================================");
+
+    proyectar("Entrenando red neuronal MLP para resolver XOR (retropropagacion pura)...");
+    modelo_xor = mlp_xor(6000, 0.8);
+
+    proyectar("\nTabla de verdad XOR vs Predicciones del modelo:");
+    tabla_pred = crear_tabla(modelo_xor["predicciones"]);
+    proyectar(tabla_pred);
+
+    proyectar("\nPruebas individuales con estimador:");
+    proyectar("[0, 0] estimado -> " + cadena(predecir_mlp(modelo_xor, [0, 0])) + " (Esperado: 0)");
+    proyectar("[0, 1] estimado -> " + cadena(predecir_mlp(modelo_xor, [0, 1])) + " (Esperado: 1)");
+    proyectar("[1, 0] estimado -> " + cadena(predecir_mlp(modelo_xor, [1, 0])) + " (Esperado: 1)");
+    proyectar("[1, 1] estimado -> " + cadena(predecir_mlp(modelo_xor, [1, 1])) + " (Esperado: 0)");
+
+    # Grafica de convergencia de perdida
+    filas_hist = [];
+    ronda (h en modelo_xor["historial"]) {
+        apilar(filas_hist, {
+            "etiqueta": "E" + cadena(h["epoca"]),
+            "perdida": h["perdida"]
+        });
+    }
+    tabla_hist = crear_tabla(filas_hist);
+
+    pizarra lineas(tabla_hist) {
+        eje_x = "etiqueta";
+        eje_y = "perdida";
+        titulo = "Curva de convergencia MSE - MLP XOR";
+        color = "rojo";
+        guardar = "salidas/mlp_xor_perdida.png";
+    }
+
+    proyectar("Grafica de convergencia exportada a 'salidas/mlp_xor_perdida.png'.");
+    proyectar("Programa 3 completado con exito.\n");
+}
+
+# ------------------------------------------------------------------
+# Programa 4: Analisis Exploratorio sobre data.xlsx
+# ------------------------------------------------------------------
+tactica ejecutar_programa_4() {
+    proyectar("\n==================================================");
+    proyectar("   Programa 4: Analisis Exploratorio (data.xlsx) ");
+    proyectar("==================================================");
+
+    proyectar("Cargando archivo 'data.xlsx' con 'fichar'...");
+    datos_xlsx = fichar("data.xlsx");
+    proyectar("Registros totales: " + cadena(longitud(datos_xlsx)));
+
+    datos_validos = datos_xlsx |> descartar(ingreso_mensual > 0 y edad > 0);
+
+    proyectar("\nResumen socioeconomico por genero:");
+    res_sexo = datos_validos
+        |> alinear(por = [sex])
+        |> balance(
+            total = contar(),
+            ingreso_promedio = media(ingreso_mensual),
+            edad_promedio = media(edad),
+            escolaridad_media = media(anios_esc)
+        );
+    proyectar(res_sexo);
+    archivar(res_sexo, "salidas/resumen_eda_sexo.csv");
+
+    proyectar("\nResumen por nivel educativo:");
+    res_edu = datos_validos
+        |> alinear(por = [nivel_edu])
+        |> balance(
+            personas = contar(),
+            ingreso_medio = media(ingreso_mensual),
+            edad_media = media(edad)
+        )
+        |> clasificar(por = [ingreso_medio], descendente = verdadero);
+    proyectar(res_edu);
+    archivar(res_edu, "salidas/resumen_eda_educacion.csv");
+
+    # Correlaciones
+    r_esc = correlacion(datos_validos["anios_esc"], datos_validos["ingreso_mensual"]);
+    proyectar("Correlacion escolaridad vs ingreso mensual (r): " + cadena(r_esc));
+
+    # Visualizacion
+    pizarra barras(res_sexo) {
+        eje_x = "sex";
+        eje_y = "ingreso_promedio";
+        titulo = "Ingreso medio segun genero (data.xlsx)";
+        color = "verde";
+        guardar = "salidas/eda_ingreso_por_sexo.png";
+    }
+
+    proyectar("Archivos exportados a 'salidas/eda_ingreso_por_sexo.png' y CSVs.");
+    proyectar("Programa 4 completado con exito.\n");
+}
+
+# ------------------------------------------------------------------
+# Programa 5: Filtro funcional para datos primos
+# ------------------------------------------------------------------
+tactica ejecutar_programa_5() {
+    proyectar("\n==================================================");
+    proyectar("   Programa 5: Filtro funcional para datos primos ");
+    proyectar("==================================================");
+
+    tactica es_primo_test(n) {
+        si (n <= 1) { resultado falso; }
+        si (n <= 3) { resultado verdadero; }
+        si (n % 2 == 0) { resultado falso; }
+        si (n % 3 == 0) { resultado falso; }
+        d = 5;
+        enjuego (d * d <= n) {
+            si (n % d == 0) { resultado falso; }
+            si (n % (d + 2) == 0) { resultado falso; }
+            d = d + 6;
+        }
+        resultado verdadero;
+    }
+
+    filas_num = [];
+    c = 1;
+    enjuego (c <= 60) {
+        apilar(filas_num, {"id": c, "valor": c});
+        c = c + 1;
+    }
+    tabla_base = crear_tabla(filas_num);
+
+    proyectar("Aplicando filtro funcional en tuberia (|>) con 'es_primo_test'...");
+    datos_primos = tabla_base |> descartar(es_primo_test(valor));
+
+    proyectar("\nNumeros primos identificados:");
+    proyectar(datos_primos);
+    proyectar("Total primos encontrados: " + cadena(longitud(datos_primos)));
+
+    archivar(datos_primos, "salidas/datos_primos.csv");
+
+    pizarra dispersion(datos_primos) {
+        eje_x = "id";
+        eje_y = "valor";
+        titulo = "Distribucion de numeros primos (1 a 60)";
+        color = "morado";
+        guardar = "salidas/grafica_primos.png";
+    }
+
+    proyectar("Exportado a 'salidas/datos_primos.csv' y 'salidas/grafica_primos.png'.");
+    proyectar("Programa 5 completado con exito.\n");
+}
+
+
+# ==================================================================
+# Bucle interactivo principal
+# ==================================================================
+
+ejecutando = verdadero;
+enjuego (ejecutando) {
+    proyectar("==================================================");
+    proyectar("   Menu principal de programas DaZe (.dz)        ");
+    proyectar("==================================================");
+    proyectar("1. Calculo de factorial (# 5 a 100)");
+    proyectar("2. Visualizacion de la funcion sigmoide");
+    proyectar("3. Perceptron multicapa para XOR (MLP)");
+    proyectar("4. Analisis exploratorio de datos (data.xlsx)");
+    proyectar("5. Filtro funcional para datos primos");
+    proyectar("6. Ejecutar todos los programas secuencialmente");
+    proyectar("0. Salir");
+    proyectar("--------------------------------------------------");
+
+    opc_str = leer("Seleccione una opcion [0-6]: ");
+    opc = entero(opc_str);
+
+    si (opc == 1) {
+        ejecutar_programa_1();
+    }
+    si (opc == 2) {
+        ejecutar_programa_2();
+    }
+    si (opc == 3) {
+        ejecutar_programa_3();
+    }
+    si (opc == 4) {
+        ejecutar_programa_4();
+    }
+    si (opc == 5) {
+        ejecutar_programa_5();
+    }
+    si (opc == 6) {
+        proyectar("\n>>> Ejecutando la suite completa de 5 programas <<<\n");
+        ejecutar_programa_1();
+        ejecutar_programa_2();
+        ejecutar_programa_3();
+        ejecutar_programa_4();
+        ejecutar_programa_5();
+    }
+    si (opc == 0) {
+        proyectar("Cerrando el menu principal.");
+        ejecutando = falso;
+    }
+    si (opc < 0 o opc > 6) {
+        proyectar("Opcion no valida. Seleccione un valor entre 0 y 6.\n");
+    }
+}

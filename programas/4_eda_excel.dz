@@ -1,0 +1,79 @@
+# ==================================================================
+# Programa 4: Analisis Exploratorio de Datos (EDA) sobre data.xlsx
+# ==================================================================
+
+proyectar("==================================================");
+proyectar("   Programa 4: Analisis Exploratorio (data.xlsx) ");
+proyectar("==================================================");
+
+# 1. Carga nativa del archivo Excel (sin dependencias externas)
+proyectar("\n1. Cargando archivo Excel 'data.xlsx' con 'fichar'...");
+datos_excel = fichar("data.xlsx");
+proyectar("Total registros cargados:");
+proyectar(longitud(datos_excel));
+
+# 2. Limpieza y preparacion de datos aptos
+proyectar("\n2. Filtrando registros validos (ingreso > 0 y edad > 0)...");
+datos_aptos = datos_excel |> descartar(ingreso_mensual > 0 y edad > 0);
+proyectar("Registros aptos para analisis:");
+proyectar(longitud(datos_aptos));
+
+# 3. Analisis agrupado por genero (sex)
+proyectar("\n3. Indicadores socioeconomicos agrupados por genero:");
+resumen_sexo = datos_aptos
+    |> alinear(por = [sex])
+    |> balance(
+        total_personas = contar(),
+        ingreso_medio = media(ingreso_mensual),
+        ingreso_mediano = mediana(ingreso_mensual),
+        edad_media = media(edad),
+        escolaridad_media = media(anios_esc)
+    );
+
+proyectar(resumen_sexo);
+archivar(resumen_sexo, "salidas/resumen_eda_sexo.csv");
+
+# 4. Analisis agrupado por nivel educativo (nivel_edu)
+proyectar("\n4. Indicadores agrupados por nivel educativo:");
+resumen_educacion = datos_aptos
+    |> alinear(por = [nivel_edu])
+    |> balance(
+        personas = contar(),
+        ingreso_medio = media(ingreso_mensual),
+        edad_media = media(edad),
+        escolaridad_media = media(anios_esc)
+    )
+    |> clasificar(por = [ingreso_medio], descendente = verdadero);
+
+proyectar(resumen_educacion);
+archivar(resumen_educacion, "salidas/resumen_eda_educacion.csv");
+
+# 5. Analisis de correlacion de Pearson
+proyectar("\n5. Correlacion estadistica de Pearson:");
+r_esc_ing = correlacion(datos_aptos["anios_esc"], datos_aptos["ingreso_mensual"]);
+r_edad_ing = correlacion(datos_aptos["edad"], datos_aptos["ingreso_mensual"]);
+
+proyectar("Correlacion escolaridad vs ingreso mensual (r): " + cadena(r_esc_ing));
+proyectar("Correlacion edad vs ingreso mensual (r): " + cadena(r_edad_ing));
+
+# 6. Renderizado de pizarras graficas
+proyectar("\n6. Renderizando visualizaciones graficas PNG...");
+
+pizarra barras(resumen_sexo) {
+    eje_x = "sex";
+    eje_y = "ingreso_medio";
+    titulo = "Ingreso medio mensual segun genero";
+    color = "verde";
+    guardar = "salidas/eda_ingreso_por_sexo.png";
+}
+
+pizarra barras(resumen_educacion) {
+    eje_x = "nivel_edu";
+    eje_y = "ingreso_medio";
+    titulo = "Ingreso medio por nivel educativo";
+    color = "azul";
+    guardar = "salidas/eda_ingreso_por_educacion.png";
+}
+
+proyectar("Pizarras exportadas a 'salidas/eda_ingreso_por_sexo.png' y 'salidas/eda_ingreso_por_educacion.png'.");
+proyectar("Programa 4 completado con exito.");

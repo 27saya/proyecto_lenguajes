@@ -1,0 +1,57 @@
+# ==================================================================
+# Programa 3: Perceptron Multicapa para XOR (Graficas y Estimador)
+# ==================================================================
+
+proyectar("==================================================");
+proyectar("   Programa 3: Perceptron Multicapa para XOR     ");
+proyectar("==================================================");
+
+proyectar("\n1. Entrenando red neuronal MLP con retropropagacion (backpropagation)...");
+proyectar("Arquitectura: 2 entradas -> 2 neuronas ocultas (sigmoide) -> 1 salida (sigmoide).");
+
+# Entrenamiento del modelo
+modelo_xor = mlp_xor(6000, 0.8);
+
+proyectar("\n2. Evaluacion de la tabla de verdad XOR vs Predicciones del Estimador:");
+predicciones_raw = modelo_xor["predicciones"];
+tabla_predicciones = crear_tabla(predicciones_raw);
+proyectar(tabla_predicciones);
+
+proyectar("\n3. Verificacion del estimador con llamadas individuales:");
+p00 = predecir_mlp(modelo_xor, [0, 0]);
+p01 = predecir_mlp(modelo_xor, [0, 1]);
+p10 = predecir_mlp(modelo_xor, [1, 0]);
+p11 = predecir_mlp(modelo_xor, [1, 1]);
+
+proyectar("Estimacion [0, 0] -> " + cadena(p00) + " (Esperado: 0)");
+proyectar("Estimacion [0, 1] -> " + cadena(p01) + " (Esperado: 1)");
+proyectar("Estimacion [1, 0] -> " + cadena(p10) + " (Esperado: 1)");
+proyectar("Estimacion [1, 1] -> " + cadena(p11) + " (Esperado: 0)");
+
+proyectar("\n4. Historial de convergencia del error cuadratico medio (MSE):");
+historial_raw = modelo_xor["historial"];
+
+# Enriquecer datos con etiquetas para el eje X
+filas_grafico = [];
+ronda (h en historial_raw) {
+    apilar(filas_grafico, {
+        "etiqueta": "E" + cadena(h["epoca"]),
+        "perdida": h["perdida"],
+        "epoca": h["epoca"]
+    });
+}
+
+tabla_perdida = crear_tabla(filas_grafico);
+proyectar(tabla_perdida);
+
+proyectar("\n5. Renderizando curva de perdida del entrenamiento:");
+pizarra lineas(tabla_perdida) {
+    eje_x = "etiqueta";
+    eje_y = "perdida";
+    titulo = "Curva de convergencia MSE - MLP XOR";
+    color = "rojo";
+    guardar = "salidas/mlp_xor_perdida.png";
+}
+
+proyectar("Grafica de convergencia exportada a 'salidas/mlp_xor_perdida.png'.");
+proyectar("Programa 3 completado con exito.");

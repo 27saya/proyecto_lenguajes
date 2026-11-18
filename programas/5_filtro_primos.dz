@@ -1,0 +1,77 @@
+# ==================================================================
+# Programa 5: Filtro funcional para datos que sean de tipo primo
+# ==================================================================
+
+proyectar("==================================================");
+proyectar("   Programa 5: Filtro funcional para datos primos ");
+proyectar("==================================================");
+
+# 1. Definicion de la funcion predicado para primalidad en el DSL
+tactica es_numero_primo(n) {
+    si (n <= 1) {
+        resultado falso;
+    }
+    si (n <= 3) {
+        resultado verdadero;
+    }
+    si (n % 2 == 0) {
+        resultado falso;
+    }
+    si (n % 3 == 0) {
+        resultado falso;
+    }
+    divisor = 5;
+    enjuego (divisor * divisor <= n) {
+        si (n % divisor == 0) {
+            resultado falso;
+        }
+        si (n % (divisor + 2) == 0) {
+            resultado falso;
+        }
+        divisor = divisor + 6;
+    }
+    resultado verdadero;
+}
+
+# 2. Generacion del conjunto de datos fuente (1 a 60)
+proyectar("\n1. Generando lote de datos numericos enteros (1 a 60):");
+
+filas_base = [];
+i = 1;
+enjuego (i <= 60) {
+    apilar(filas_base, {
+        "id": i,
+        "valor": i,
+        "cuadrado": i * i
+    });
+    i = i + 1;
+}
+
+tabla_numeros = crear_tabla(filas_base);
+proyectar("Total registros generados: " + cadena(longitud(tabla_numeros)));
+
+# 3. Aplicacion funcional del filtro mediante pipeline (|>) y predicado
+proyectar("\n2. Aplicando filtro funcional en tubería (|>) usando predicado 'es_numero_primo':");
+datos_primos = tabla_numeros |> descartar(es_numero_primo(valor));
+
+proyectar("\n3. Registros que pasaron el filtro (numeros primos encontrados):");
+proyectar(datos_primos);
+
+proyectar("Total de numeros primos encontrados entre 1 y 60: " + cadena(longitud(datos_primos)));
+
+# 4. Exportacion de la tabla filtrada a CSV
+archivar(datos_primos, "salidas/datos_primos.csv");
+
+# 5. Visualizacion de distribucion de los numeros primos encontrados
+proyectar("\n4. Generando visualizacion de distribucion:");
+pizarra dispersion(datos_primos) {
+    eje_x = "id";
+    eje_y = "valor";
+    titulo = "Distribucion de numeros primos (1 a 60)";
+    color = "morado";
+    guardar = "salidas/grafica_primos.png";
+}
+
+proyectar("Archivo CSV archivado en 'salidas/datos_primos.csv'.");
+proyectar("Pizarra exportada a 'salidas/grafica_primos.png'.");
+proyectar("Programa 5 completado con exito.");

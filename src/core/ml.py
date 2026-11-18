@@ -175,3 +175,137 @@ regresionlineal = regresion_lineal
 predecir = predecir_regresion
 agruparkmedias = agrupar_kmedias
 kmedias = agrupar_kmedias
+
+
+class PerceptronMulticapaXOR:
+    """
+    Red Neuronal Multicapa (MLP) para resolver el problema no lineal XOR.
+    Arquitectura: 2 entradas -> 2 neuronas ocultas (sigmoide) -> 1 salida (sigmoide).
+    Entrenamiento puro mediante retropropagacion (backpropagation).
+    """
+
+    def __init__(self):
+        self.w_ih = [[0.5, -0.5], [-0.5, 0.5]]
+        self.b_h = [0.0, 0.0]
+        self.w_ho = [0.5, 0.5]
+        self.b_o = 0.0
+        self.historial = []
+
+    def __getitem__(self, clave):
+        if hasattr(self, clave):
+            return getattr(self, clave)
+        if clave == "modelo":
+            return self
+        if clave == "predicciones":
+            return self.evaluar_tabla()
+        raise KeyError(clave)
+
+    def _sigmoide(self, x):
+        from .matematica import exp
+        if x < -50:
+            return 0.0
+        if x > 50:
+            return 1.0
+        return 1.0 / (1.0 + exp(-x))
+
+    def _d_sigmoide(self, y):
+        return y * (1.0 - y)
+
+    def ajustar(self, epocas=6000, lr=0.8):
+        import random
+        random.seed(42)
+        self.w_ih = [[random.uniform(-1.0, 1.0) for _ in range(2)] for _ in range(2)]
+        self.b_h = [random.uniform(-1.0, 1.0) for _ in range(2)]
+        self.w_ho = [random.uniform(-1.0, 1.0) for _ in range(2)]
+        self.b_o = random.uniform(-1.0, 1.0)
+
+        X = [[0, 0], [0, 1], [1, 0], [1, 1]]
+        Y = [0, 1, 1, 0]
+
+        historial_perdida = []
+        intervalo = max(1, epocas // 10)
+
+        for epoca in range(epocas):
+            error_total = 0.0
+            for x, y_target in zip(X, Y):
+                # Propagacion hacia adelante
+                h_net = [x[0] * self.w_ih[0][j] + x[1] * self.w_ih[1][j] + self.b_h[j] for j in range(2)]
+                h_out = [self._sigmoide(val) for val in h_net]
+
+                o_net = h_out[0] * self.w_ho[0] + h_out[1] * self.w_ho[1] + self.b_o
+                o_out = self._sigmoide(o_net)
+
+                err = y_target - o_out
+                error_total += err ** 2
+
+                # Retropropagacion del error
+                delta_o = err * self._d_sigmoide(o_out)
+                delta_h = [delta_o * self.w_ho[j] * self._d_sigmoide(h_out[j]) for j in range(2)]
+
+                # Actualizacion capa de salida
+                for j in range(2):
+                    self.w_ho[j] += lr * delta_o * h_out[j]
+                self.b_o += lr * delta_o
+
+                # Actualizacion capa oculta
+                for i in range(2):
+                    for j in range(2):
+                        self.w_ih[i][j] += lr * delta_h[j] * x[i]
+                for j in range(2):
+                    self.b_h[j] += lr * delta_h[j]
+
+            mse = error_total / 4.0
+            if epoca % intervalo == 0 or epoca == epocas - 1:
+                historial_perdida.append({"epoca": epoca, "perdida": round(mse, 6)})
+
+        self.historial = historial_perdida
+        return self
+
+    def predecir(self, x):
+        h_net = [x[0] * self.w_ih[0][j] + x[1] * self.w_ih[1][j] + self.b_h[j] for j in range(2)]
+        h_out = [self._sigmoide(val) for val in h_net]
+        o_net = h_out[0] * self.w_ho[0] + h_out[1] * self.w_ho[1] + self.b_o
+        return round(self._sigmoide(o_net), 4)
+
+    def evaluar_tabla(self):
+        casos = [[0, 0], [0, 1], [1, 0], [1, 1]]
+        esperados = [0, 1, 1, 0]
+        filas = []
+        for x, y_esp in zip(casos, esperados):
+            y_pred = self.predecir(x)
+            filas.append({
+                "x1": x[0],
+                "x2": x[1],
+                "esperado": y_esp,
+                "estimado": y_pred,
+                "clasificacion": 1 if y_pred >= 0.5 else 0
+            })
+        return filas
+
+
+def entrenar_mlp_xor(epocas=6000, lr=0.8):
+    """Entrena un perceptron multicapa para XOR y retorna el modelo e historial."""
+    mlp = PerceptronMulticapaXOR()
+    mlp.ajustar(epocas=epocas, lr=lr)
+    return {
+        "modelo": mlp,
+        "historial": mlp.historial,
+        "predicciones": mlp.evaluar_tabla(),
+        "_modelo": mlp
+    }
+
+
+def predecir_mlp(modelo, x):
+    """Estima la salida de un vector x usando el perceptron multicapa."""
+    if isinstance(modelo, dict):
+        if "modelo" in modelo:
+            return modelo["modelo"].predecir(x)
+        if "_modelo" in modelo:
+            return modelo["_modelo"].predecir(x)
+    if hasattr(modelo, "predecir"):
+        return modelo.predecir(x)
+    raise ValueError("Objeto de modelo MLP no valido para inferencia.")
+
+
+mlp_xor = entrenar_mlp_xor
+

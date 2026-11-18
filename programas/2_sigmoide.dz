@@ -1,0 +1,45 @@
+# ==================================================================
+# Programa 2: Calculo y visualizacion de la funcion Sigmoide
+# ==================================================================
+
+proyectar("==================================================");
+proyectar("   Programa 2: Visualizacion de la funcion Sigmoide");
+proyectar("==================================================");
+
+# Definicion de tactica para calculo sigmoide: 1 / (1 + e^-x)
+tactica mi_sigmoide(x) {
+    resultado 1.0 / (1.0 + exp(-x));
+}
+
+proyectar("\n1. Generando puntos de la curva sigmoide en x en [-6.0, 6.0]:");
+
+filas_curva = [];
+x_val = -6.0;
+
+# Muestreo con paso 1.0 para graficacion y tabla clara
+enjuego (x_val <= 6.0) {
+    s_val = mi_sigmoide(x_val);
+    apilar(filas_curva, {
+        "x": x_val,
+        "sigmoide": s_val,
+        "etiqueta": "x=" + cadena(x_val)
+    });
+    x_val = x_val + 1.0;
+}
+
+tabla_sigmoide = crear_tabla(filas_curva);
+
+proyectar("\n2. Puntos proyectados de la funcion sigmoide:");
+proyectar(tabla_sigmoide);
+
+proyectar("\n3. Renderizando pizarra visual (lineas continuas):");
+pizarra lineas(tabla_sigmoide) {
+    eje_x = "etiqueta";
+    eje_y = "sigmoide";
+    titulo = "Curva Sigmoide 1 / (1 + e^-x)";
+    color = "azul";
+    guardar = "salidas/grafica_sigmoide.png";
+}
+
+proyectar("Pizarra de la funcion sigmoide exportada a 'salidas/grafica_sigmoide.png'.");
+proyectar("Programa 2 completado con exito.");

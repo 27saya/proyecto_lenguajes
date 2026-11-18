@@ -7,7 +7,7 @@ from src.generated.DaZeParser import DaZeParser
 from src.generated.DaZeParserVisitor import DaZeParserVisitor
 from src.core.racoons import Tabla, GrupoTabla
 from src.core.visualizador import renderizar_pizarra_nativa
-from src.core.ml import correlacion_pearson, RegresionLineal, KMeans
+from src.core.ml import correlacion_pearson, RegresionLineal, KMeans, entrenar_mlp_xor, predecir_mlp, PerceptronMulticapaXOR
 from src.core.estructuras import Pila, Cola
 import src.core.matematica as mate
 from src.semantic.tabla_simbolos import TablaSimbolos, Simbolo
@@ -30,6 +30,13 @@ class TacticaDefinicion:
 
     def __repr__(self):
         return f"<Tactica {self.nombre}({', '.join(self.parametros)})>"
+
+
+def _leer_consola(prompt=""):
+    try:
+        return input(str(prompt))
+    except (EOFError, KeyboardInterrupt):
+        return "0"
 
 
 class DaZeSemanticVisitor(DaZeParserVisitor):
@@ -58,15 +65,31 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
             "maximo": mate.maximo_coleccion,
             "minimo": mate.minimo_coleccion,
             "promedio": mate.promedio_coleccion,
+            "exp": mate.exp,
+            "sigmoide": mate.sigmoide,
+            "factorial": mate.factorial,
+            "es_primo": mate.es_primo,
             "pila": lambda: Pila(),
             "cola": lambda: Cola(),
-            "apilar": lambda p, x: p.apilar(x) if isinstance(p, Pila) else self._err_tipo("Pila", p),
-            "desapilar": lambda p: p.desapilar() if isinstance(p, Pila) else self._err_tipo("Pila", p),
-            "tope": lambda p: p.tope() if isinstance(p, Pila) else self._err_tipo("Pila", p),
-            "encolar": lambda c, x: c.encolar(x) if isinstance(c, Cola) else self._err_tipo("Cola", c),
-            "desencolar": lambda c: c.desencolar() if isinstance(c, Cola) else self._err_tipo("Cola", c),
-            "frente": lambda c: c.frente() if isinstance(c, Cola) else self._err_tipo("Cola", c),
+            "apilar": lambda p, x: p.append(x) if isinstance(p, list) else (p.apilar(x) if isinstance(p, Pila) else self._err_tipo("Pila o Lista", p)),
+            "desapilar": lambda p: p.pop() if isinstance(p, list) else (p.desapilar() if isinstance(p, Pila) else self._err_tipo("Pila o Lista", p)),
+            "tope": lambda p: p[-1] if isinstance(p, list) and p else (p.tope() if isinstance(p, Pila) else self._err_tipo("Pila o Lista", p)),
+            "encolar": lambda c, x: c.append(x) if isinstance(c, list) else (c.encolar(x) if isinstance(c, Cola) else self._err_tipo("Cola o Lista", c)),
+            "desencolar": lambda c: c.pop(0) if isinstance(c, list) else (c.desencolar() if isinstance(c, Cola) else self._err_tipo("Cola o Lista", c)),
+            "frente": lambda c: c[0] if isinstance(c, list) and c else (c.frente() if isinstance(c, Cola) else self._err_tipo("Cola o Lista", c)),
+            "agregar": lambda col, x: col.append(x) if isinstance(col, list) else (col.apilar(x) if isinstance(col, Pila) else col.encolar(x)),
             "longitud": lambda col: len(col),
+            "leer": lambda prompt="": _leer_consola(prompt),
+            "entrada": lambda prompt="": _leer_consola(prompt),
+            "entero": lambda x: int(x) if x is not None and str(x).strip() != "" else 0,
+            "decimal": lambda x: float(x) if x is not None and str(x).strip() != "" else 0.0,
+            "cadena": lambda x: str(x) if x is not None else "",
+            "rango": lambda *args: list(range(*args)),
+            "crear_tabla": lambda filas: Tabla.desde_filas(filas) if isinstance(filas, list) else Tabla([], []),
+            "tabla": lambda filas: Tabla.desde_filas(filas) if isinstance(filas, list) else Tabla([], []),
+            "mlp_xor": lambda epocas=6000, lr=0.8: entrenar_mlp_xor(epocas=epocas, lr=lr),
+            "entrenar_mlp_xor": lambda epocas=6000, lr=0.8: entrenar_mlp_xor(epocas=epocas, lr=lr),
+            "predecir_mlp": lambda mod, x: predecir_mlp(mod, x),
         }
         for nombre, func in nativas.items():
             self.tabla_simbolos.definir(nombre, func, tipo="TACTICA")
@@ -438,6 +461,20 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
         ruta_rel = ctx.CADENA().getText().strip('"\'')
         ruta = self._resolver_ruta(ruta_rel)
 
+        # Carga nativa de hojas de calculo Excel (.xlsx, .xlsm)
+        if ruta.lower().endswith((".xlsx", ".xlsm")):
+            hoja = None
+            if ctx.argumentos_con_nombre():
+                for arg in ctx.argumentos_con_nombre().argumento_con_nombre():
+                    clave = arg.identificador().getText().lower()
+                    val = self.visit(arg.expr())
+                    if clave in ("hoja", "sheet"):
+                        hoja = str(val)
+            try:
+                return Tabla.excelread(ruta, hoja=hoja)
+            except Exception as e:
+                raise self._error(f"Error cargando archivo Excel con 'fichar': {str(e)}", ctx, ruta_rel)
+
         separador = ","
         encabezado = True
 
@@ -463,7 +500,7 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
             raise self._error("La instruccion 'archivar' requiere una tabla deportiva valida como primer argumento.", ctx)
 
         ruta_texto = ctx.CADENA().getText().strip('"\'')
-        if os.path.basename(self.base_dir) == "examples" and not os.path.isabs(ruta_texto):
+        if os.path.basename(self.base_dir) in ("examples", "programas") and not os.path.isabs(ruta_texto):
             ruta = os.path.normpath(os.path.join(self.base_dir, "..", ruta_texto))
         else:
             ruta = os.path.normpath(os.path.join(self.base_dir, ruta_texto))
@@ -619,7 +656,7 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
             if not isinstance(tabla_val, Tabla):
                 raise self._error("La funcion 'archivar' requiere una tabla valida.", ctx)
             ruta_texto = str(args_evaluados[1]) if len(args_evaluados) > 1 else "salidas/exportacion.csv"
-            if os.path.basename(self.base_dir) == "examples" and not os.path.isabs(ruta_texto):
+            if os.path.basename(self.base_dir) in ("examples", "programas") and not os.path.isabs(ruta_texto):
                 ruta = os.path.normpath(os.path.join(self.base_dir, "..", ruta_texto))
             else:
                 ruta = os.path.normpath(os.path.join(self.base_dir, ruta_texto))
@@ -698,7 +735,8 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
 
     def visitExprCadena(self, ctx: DaZeParser.ExprCadenaContext):
         txt = ctx.CADENA().getText()
-        return txt[1:-1]
+        contenido = txt[1:-1]
+        return contenido.replace("\\n", "\n").replace("\\t", "\t")
 
     def visitExprVerdadero(self, ctx: DaZeParser.ExprVerdaderoContext):
         return True
@@ -838,13 +876,24 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
             "correlacion", "correlacion_pearson",
             "regresion_lineal", "regresionlineal",
             "predecir_regresion", "predecir",
-            "agrupar_kmedias", "agruparkmedias", "kmedias"
+            "agrupar_kmedias", "agruparkmedias", "kmedias",
+            "mlp_xor", "entrenar_mlp_xor", "predecir_mlp"
         ):
             _ml_args = []
             if hasattr(ctx, "lista_argumentos") and ctx.lista_argumentos():
                 for _a in ctx.lista_argumentos().argumento():
                     _expr = _a.expr() if hasattr(_a, "expr") and _a.expr() else _a
                     _ml_args.append(self.visit(_expr))
+
+            if nombre in ("mlp_xor", "entrenar_mlp_xor"):
+                epocas = int(_ml_args[0]) if len(_ml_args) > 0 else 6000
+                lr = float(_ml_args[1]) if len(_ml_args) > 1 else 0.8
+                return entrenar_mlp_xor(epocas=epocas, lr=lr)
+
+            if nombre in ("predecir_mlp",):
+                if len(_ml_args) < 2:
+                    raise Exception("predecir_mlp() requiere el modelo y el vector: predecir_mlp(mod, [x1, x2])")
+                return predecir_mlp(_ml_args[0], _ml_args[1])
 
             if nombre in ("correlacion", "correlacion_pearson"):
                 if len(_ml_args) != 2:
@@ -990,6 +1039,10 @@ class DaZeSemanticVisitor(DaZeParserVisitor):
         elif isinstance(contenedor, dict):
             if indice not in contenedor:
                 raise self._error(f"Clave '{indice}' no existe en el diccionario.", ctx)
+            return contenedor[indice]
+        elif isinstance(contenedor, Tabla):
+            if isinstance(indice, str) and indice not in contenedor.columnas:
+                raise self._error(f"Columna '{indice}' no existe en la tabla.", ctx)
             return contenedor[indice]
         raise self._error(f"El tipo '{type(contenedor).__name__}' no admite acceso por corchetes.", ctx)
 

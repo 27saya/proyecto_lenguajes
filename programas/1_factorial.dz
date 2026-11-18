@@ -1,0 +1,52 @@
+# ==================================================================
+# Programa 1: Calculo de factorial para numeros del 5 al 100
+# ==================================================================
+
+proyectar("==================================================");
+proyectar("   Programa 1: Funcion factorial (# 5 a 100)      ");
+proyectar("==================================================");
+
+# Definicion de tactica factorial en el DSL
+tactica calcular_factorial(n) {
+    si (n <= 1) {
+        resultado 1;
+    }
+    acumulado = 1;
+    cursor = 2;
+    enjuego (cursor <= n) {
+        acumulado = acumulado * cursor;
+        cursor = cursor + 1;
+    }
+    resultado acumulado;
+}
+
+# 1. Calculo paso a paso para muestra de valores clave
+proyectar("\n1. Muestra de factoriales clave en el rango [5, 100]:");
+claves = [5, 6, 7, 10, 15, 20, 25, 50, 75, 100];
+
+ronda (num en claves) {
+    fact = calcular_factorial(num);
+    proyectar("Factorial de " + cadena(num) + ":");
+    proyectar(fact);
+}
+
+# 2. Generacion de tabla con factoriales del 5 al 15 para inspeccion
+proyectar("\n2. Tabla de factoriales inmediatos (5 al 15):");
+filas_tabla = [];
+n_actual = 5;
+enjuego (n_actual <= 15) {
+    f_val = calcular_factorial(n_actual);
+    apilar(filas_tabla, {"numero": n_actual, "factorial": f_val});
+    n_actual = n_actual + 1;
+}
+
+tabla_factoriales = crear_tabla(filas_tabla);
+proyectar(tabla_factoriales);
+
+# 3. Comprobacion de limites
+fact_5 = calcular_factorial(5);
+fact_100 = calcular_factorial(100);
+proyectar("\nVerificacion de limites:");
+proyectar("Limite inferior 5!  = " + cadena(fact_5));
+proyectar("Limite superior 100! calculado exitosamente (precision arbitraria).");
+proyectar("Programa 1 completado con exito.");

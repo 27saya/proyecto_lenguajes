@@ -102,6 +102,15 @@ class Tabla:
         self.columnas: List[str] = list(columnas) if columnas is not None else []
         self.filas: List[Dict[str, Any]] = [dict(f) for f in filas] if filas is not None else []
 
+    def __getitem__(self, item: Any) -> Any:
+        if isinstance(item, str):
+            if item in self.columnas:
+                return self.obtenercolumna(item)
+            raise KeyError(f"Columna '{item}' no existe en la tabla.")
+        elif isinstance(item, int):
+            return self.filas[item]
+        raise TypeError(f"Indice de tabla no valido: {type(item).__name__}")
+
     @classmethod
     def csvread(cls, ruta: str, separador: str = ",", encabezado: bool = True, encoding: str = "utf-8") -> "Tabla":
         if not os.path.exists(ruta):
@@ -135,6 +144,76 @@ class Tabla:
             filas_procesadas.append(dict_fila)
 
         return cls(columnas_finales, filas_procesadas)
+
+    @classmethod
+    def desde_filas(cls, filas: List[Dict[str, Any]]) -> "Tabla":
+        if not filas:
+            return cls([], [])
+        cols = list(filas[0].keys())
+        return cls(cols, filas)
+
+    @classmethod
+    def excelread(cls, ruta: str, hoja: Optional[str] = None) -> "Tabla":
+        import zipfile
+        import xml.etree.ElementTree as ET
+
+        if not os.path.exists(ruta):
+            raise FileNotFoundError(f"No se encontro el archivo de datos Excel: '{ruta}'")
+
+        with zipfile.ZipFile(ruta, "r") as z:
+            shared_strings: List[str] = []
+            if "xl/sharedStrings.xml" in z.namelist():
+                sst = ET.fromstring(z.read("xl/sharedStrings.xml"))
+                for si in sst.findall("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}si"):
+                    t_el = si.find("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}t")
+                    shared_strings.append(t_el.text if t_el is not None and t_el.text is not None else "")
+
+            hoja_xml = "xl/worksheets/sheet1.xml"
+            if "xl/workbook.xml" in z.namelist():
+                wb = ET.fromstring(z.read("xl/workbook.xml"))
+                sheets_elems = wb.findall(".//{http://schemas.openxmlformats.org/spreadsheetml/2006/main}sheet")
+                for idx, s in enumerate(sheets_elems):
+                    s_name = s.attrib.get("name", f"Sheet{idx+1}")
+                    if hoja and s_name.lower() == hoja.lower():
+                        hoja_xml = f"xl/worksheets/sheet{idx+1}.xml"
+                        break
+
+            if hoja_xml not in z.namelist():
+                for f in z.namelist():
+                    if f.startswith("xl/worksheets/sheet") and f.endswith(".xml"):
+                        hoja_xml = f
+                        break
+
+            s_tree = ET.fromstring(z.read(hoja_xml))
+            rows = s_tree.findall(".//{http://schemas.openxmlformats.org/spreadsheetml/2006/main}row")
+            if not rows:
+                return cls([], [])
+
+            filas_procesadas: List[Dict[str, Any]] = []
+            columnas_finales: List[str] = []
+
+            for r_idx, r in enumerate(rows):
+                valores_celda: List[str] = []
+                for c in r.findall("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}c"):
+                    v = c.find("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}v")
+                    t = c.attrib.get("t")
+                    val_str = v.text if v is not None and v.text is not None else ""
+                    if t == "s" and val_str.isdigit() and int(val_str) < len(shared_strings):
+                        val_str = shared_strings[int(val_str)]
+                    valores_celda.append(val_str)
+
+                if r_idx == 0:
+                    columnas_finales = [str(c).strip() for c in valores_celda]
+                else:
+                    if not valores_celda or all(str(v).strip() == "" for v in valores_celda):
+                        continue
+                    dict_fila = {}
+                    for col_idx, col_name in enumerate(columnas_finales):
+                        raw_v = valores_celda[col_idx] if col_idx < len(valores_celda) else ""
+                        dict_fila[col_name] = _inferir_tipo(raw_v)
+                    filas_procesadas.append(dict_fila)
+
+            return cls(columnas_finales, filas_procesadas)
 
     def csvsave(self, ruta: str, separador: str = ",", encoding: str = "utf-8") -> None:
         directorio = os.path.dirname(ruta)
